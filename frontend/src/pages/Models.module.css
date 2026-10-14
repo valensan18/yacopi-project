@@ -1,0 +1,124 @@
+.statusSection {
+  margin-bottom: var(--s6);
+}
+
+.sectionTitle {
+  font-size: var(--fs-h2);
+  margin-bottom: var(--s3);
+}
+
+.subTitle {
+  font-size: var(--fs-h3);
+  margin: var(--s4) 0 var(--s2);
+}
+
+.statusCard {
+  background: var(--ink-2);
+  border: 1px solid rgba(232, 180, 79, 0.3);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+}
+
+.statusCode {
+  color: var(--amber-data);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--s2);
+}
+
+.statusReason {
+  color: var(--stone);
+  font-size: 0.9rem;
+  margin: var(--s2) 0 0;
+}
+
+.expCard {
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  margin-top: var(--s2);
+}
+
+.expCard .mono {
+  color: var(--copper);
+}
+
+.expNote {
+  color: var(--stone);
+  font-size: 0.9rem;
+  margin-top: var(--s2);
+}
+
+.expNote .mono {
+  color: var(--stone);
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s4);
+  color: var(--chalk);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  background: var(--ink-2);
+  margin-bottom: var(--s2);
+}
+
+.table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.caption {
+  text-align: left;
+  padding: var(--s2);
+  color: var(--stone);
+  font-size: 0.85rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.6rem var(--s2);
+  color: var(--stone);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: 0.6rem var(--s2);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.05);
+}
+
+.table tbody tr.selected {
+  background: rgba(47, 107, 82, 0.12);
+}
+
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tableNote {
+  color: var(--stone);
+  font-size: 0.92rem;
+}
+
+.tableNote .mono {
+  color: var(--copper);
+}
+
+@media (max-width: 1023px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+}

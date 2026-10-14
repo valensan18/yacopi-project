@@ -1,0 +1,127 @@
+.page {
+  background: var(--paper);
+  color: var(--sepia);
+  min-height: 100vh;
+  padding-bottom: var(--s7);
+}
+
+.page :global(.section-kicker) {
+  color: var(--copper);
+}
+
+.section {
+  max-width: 46rem;
+  margin-bottom: var(--s6);
+}
+
+.sectionTitle {
+  font-size: var(--fs-h2);
+  color: var(--sepia);
+  margin-bottom: var(--s2);
+}
+
+.section p {
+  color: var(--sepia);
+  line-height: 1.75;
+}
+
+.timelineSection {
+  margin-bottom: var(--s6);
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid rgba(42, 33, 24, 0.25);
+  padding-left: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+
+.timelineItem {
+  position: relative;
+}
+
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--s3) - 3.5px);
+  top: 0.4rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--copper);
+}
+
+.timelineHead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  flex-wrap: wrap;
+}
+
+.timelineState {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+.done {
+  background: rgba(47, 107, 82, 0.14);
+  color: #1e4d3b;
+  border: 1px solid rgba(30, 77, 59, 0.5);
+}
+
+.exp {
+  background: rgba(201, 123, 74, 0.12);
+  color: #a05a2c;
+  border: 1px solid rgba(201, 123, 74, 0.5);
+}
+
+.wip {
+  background: rgba(42, 33, 24, 0.08);
+  color: #6d5f51;
+  border: 1px solid rgba(42, 33, 24, 0.3);
+}
+
+.timelineTitle {
+  font-size: var(--fs-h3);
+  color: var(--sepia);
+}
+
+.timelineText {
+  margin-top: var(--s1);
+  color: var(--sepia);
+  max-width: 42rem;
+}
+
+.facts {
+  padding-left: var(--s3);
+  color: var(--sepia);
+  line-height: 1.75;
+}
+
+.asideNote {
+  border-left: 3px solid var(--copper);
+  padding: var(--s2) var(--s3);
+  margin: var(--s3) 0;
+  background: rgba(201, 123, 74, 0.06);
+  font-size: 0.92rem;
+  color: var(--sepia);
+}
+
+.asideKicker {
+  color: var(--copper);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: var(--s1);
+}
+
+.inlineLink {
+  color: #a05a2c;
+  text-decoration: underline;
+}

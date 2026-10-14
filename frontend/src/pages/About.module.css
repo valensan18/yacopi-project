@@ -1,0 +1,64 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s4);
+  padding-bottom: var(--s5);
+}
+
+.card {
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-lg);
+  padding: var(--s3);
+}
+
+.cardTitle {
+  font-size: var(--fs-h3);
+  margin-bottom: var(--s2);
+}
+
+.card p,
+.card li {
+  color: var(--stone);
+  font-size: 0.95rem;
+}
+
+.flow {
+  margin: 0;
+  padding-left: var(--s3);
+  line-height: 1.9;
+}
+
+.techSection {
+  padding-bottom: var(--s5);
+}
+
+.techList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--s2);
+  margin: var(--s3) 0 0;
+}
+
+.techList div {
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  padding: var(--s2);
+}
+
+.techList dt {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.techList dd {
+  margin: 0;
+  color: var(--stone);
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
