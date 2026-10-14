@@ -1,5 +1,6 @@
 import 'leaflet/dist/leaflet.css'
 import { CircleMarker, MapContainer, TileLayer, Tooltip } from 'react-leaflet'
+import { getBasemapConfig } from '../lib/basemap'
 import styles from './MiniMap.module.css'
 
 interface MiniMapProps {
@@ -9,6 +10,7 @@ interface MiniMapProps {
 }
 
 export default function MiniMap({ lat, lon, label }: MiniMapProps) {
+  const basemap = getBasemapConfig()
   return (
     <div className={styles.mapBox} data-lenis-prevent>
       <MapContainer
@@ -17,10 +19,7 @@ export default function MiniMap({ lat, lon, label }: MiniMapProps) {
         scrollWheelZoom={false}
         style={{ height: '100%', width: '100%', background: '#0b1613' }}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        />
+        <TileLayer attribution={basemap.attribution} url={basemap.url} />
         <CircleMarker
           center={[lat, lon]}
           radius={8}

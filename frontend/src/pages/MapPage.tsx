@@ -5,6 +5,7 @@ import L from 'leaflet'
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { apiGet } from '../api/client'
 import type { MapPoints } from '../api/types'
+import { getBasemapConfig } from '../lib/basemap'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
 import { EmptyState, ErrorState, LoadingSkeleton } from '../components/states'
@@ -215,8 +216,8 @@ export default function MapPage() {
             preferCanvas
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              attribution={getBasemapConfig().attribution}
+              url={getBasemapConfig().url}
             />
             <BboxController onBboxChange={handleBboxChange} />
             {query.isLoading && !query.data && null}

@@ -316,6 +316,12 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 - 8 rutas responden 200 con los servidores reales; proxy API verificado;
   POST oficial devuelve 503 real.
 - Capturas en `docs/capturas/` (home desktop/móvil + 6 pantallas).
+- Cartografía: CARTO Basemaps Dark Matter como mapa base con clave vía
+  `VITE_CARTO_BASEMAPS_KEY` (frontend/.env.local, excluido de Git; la
+  variable VITE_ es pública en el navegador y se recomiendan restricciones
+  de dominio en el panel de CARTO). Sin clave → respaldo OpenStreetMap
+  estándar sin marcas de agua. Verificado: tesela real de Yacopí responde
+  200 image/png con el endpoint rastertiles oficial.
 - Limitación documentada: la búsqueda de predios es por public_id exacto
   (el endpoint actual no filtra por prefijo; ampliación futura requiere
   cambio mínimo compatible del contrato, pendiente de autorización).
