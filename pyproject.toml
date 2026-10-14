@@ -5,6 +5,9 @@ testpaths = ["ml/tests", "backend/tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+# Script heredado de la fase de datos previa: se conserva byte-idéntico como
+# referencia de reproducibilidad; su estilo no se ajusta en esta fase.
+exclude = ["scripts/preparar_datos.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

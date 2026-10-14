@@ -1,56 +1,72 @@
-# Lista explícita permitida (allowlist) de características del modelo.
-# BORRADOR para Fase 2 — nada de esto es definitivo hasta auditar cada
-# columna en tiempo de inferencia, relación con la etiqueta y fuga.
+﻿# Lista explícita permitida (allowlist) de características del modelo.
+# Fase 1: actualizada con cardinalidades y cobertura REALES del consolidado
+# (7.709 predios). Nada es definitivo hasta la Fase 2 (auditoría de fuga y
+# disponibilidad en inferencia).
 features:
   allowed:
     - name: area_terreno_catastral_m2
       kind: numeric
       unit: m2
-      notes: superficie catastral; revisar definición/fecha
+      notes: superficie catastral; 0 nulos; auditar efecto mecánico si y es por ha
     - name: area_zhf_m2
       kind: numeric
       unit: m2
-      notes: AREA_TERRE de la segunda fuente; definición por validar
+      notes: AREA_TERRE; 15 nulos; difiere >5% de la catastral en 4.924 predios
     - name: area_construida_m2
       kind: numeric
       unit: m2
-      notes: superficie construida declarada
+      notes: 3.033 predios > 0; usar con cautela si la etiqueta mezcla suelo+obra
     - name: destino_economico
       kind: categorical
-      notes: categorías como texto, nunca cantidad
+      notes: "10 categorías (Agropecuario 6.746; Religioso 627; Habitacional 225; resto 111)"
     - name: tr_latitud
       kind: numeric
-      notes: coordenada referencial ZHF; auditar exactitud y fuga espacial
+      notes: 15 nulos; 7.694 válidas en rango Colombia; auditar memorización espacial
     - name: tr_longitud
       kind: numeric
-      notes: coordenada referencial ZHF
+      notes: idem tr_latitud
     - name: zhf_codigo
       kind: categorical
-      notes: código ZHF
+      notes: 16 categorías
     - name: zhf_dispon
       kind: categorical
+      notes: "4 categorías (4: 4.541; 3: 3.112; 2: 41; vacío: 15)"
     - name: zhf_influe
       kind: categorical
+      notes: "4 categorías (5: 4.656; 3: 2.049; 8: 989; vacío: 15)"
     - name: zhf_uso_ac
       kind: categorical
+      notes: "3 categorías (16: 7.474; 12: 220; vacío: 15)"
     - name: aht_vpoten
       kind: categorical
+      notes: "16 categorías; 40 vacíos"
+    - name: fa_element
+      kind: categorical
+      notes: "2 categorías; 471 vacíos (cobertura baja); decisión en Fase 2"
     - name: vus_vocaci
       kind: categorical
+      notes: 9 categorías
     - name: ups
       kind: categorical
+      notes: "4 categorías (19 vacíos)"
     - name: clc_nivel1
       kind: categorical
+      notes: 7 categorías; N/A conservado como categoría
     - name: clc_nivel2
       kind: categorical
+      notes: 13 categorías
     - name: clc_nivel3
       kind: categorical
+      notes: 30 categorías
     - name: clc_nivel4
       kind: categorical
+      notes: "28 categorías (N/A: 6.100)"
     - name: clc_nivel5
       kind: categorical
+      notes: "11 categorías (N/A: 7.430)"
     - name: clc_nivel6
       kind: categorical
+      notes: "4 categorías (N/A: 7.510)"
 
 # Columnas PROHIBIDAS como X (fuga de la variable objetivo o derivadas de ella)
 blocked:

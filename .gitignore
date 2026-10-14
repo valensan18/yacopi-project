@@ -36,6 +36,7 @@ data/raw/
 data/processed/
 data/external/
 data/splits/
+data/maps/
 *.csv
 *.parquet
 *.gpkg
