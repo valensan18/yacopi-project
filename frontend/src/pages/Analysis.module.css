@@ -1,0 +1,89 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s4);
+  padding-bottom: var(--s6);
+}
+
+.chartSection {
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-lg);
+  padding: var(--s3);
+}
+
+.chartTitle {
+  font-size: var(--fs-h3);
+  margin-bottom: var(--s2);
+}
+
+.chart {
+  min-height: 18rem;
+}
+
+.chartMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s2);
+  color: var(--copper);
+  font-size: 0.8rem;
+  margin: var(--s1) 0 0;
+}
+
+.chartSource {
+  color: var(--stone);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  text-align: right;
+}
+
+.chartSummary {
+  color: var(--stone);
+  font-size: 0.9rem;
+  margin: var(--s2) 0 0;
+}
+
+.coverage {
+  padding-bottom: var(--s6);
+}
+
+.coverageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s3);
+  margin-top: var(--s2);
+}
+
+.coverageCard {
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+}
+
+.coverageValue {
+  font-family: var(--font-display);
+  font-size: var(--fs-data);
+  color: var(--copper);
+  margin: 0;
+}
+
+.coverageLabel {
+  margin-top: var(--s1);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.coverageCard .mono {
+  color: var(--stone);
+  margin-top: var(--s1);
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .coverageGrid {
+    grid-template-columns: 1fr;
+  }
+}
