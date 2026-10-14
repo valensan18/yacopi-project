@@ -8,7 +8,7 @@ su criterio de aceptación.
 
 ---
 
-## FASE 0 — Inicialización del repositorio y entorno (EN CURSO)
+## FASE 0 — Inicialización del repositorio y entorno (COMPLETADA 2026-10-14)
 
 ### Decisiones tomadas
 
@@ -21,36 +21,50 @@ su criterio de aceptación.
 - Identidad de autor SOLO local: `valensan18` /
   `342352447+valensan18@users.noreply.github.com` (derivada del ID público de
   la API de GitHub, formato oficial noreply). La configuración global de Git
-  (`DIEGHOST64`) permanece intacta.
+  (`DIEGHOST64`) permanece intacta. Verificada en commit local.
 - Clave SSH dedicada `~/.ssh/id_ed25519_valensan18` + alias
   `github-valensan18` en `~/.ssh/config` (nuevo; no existía config previo).
-  La clave personal `id_ed25519` no se modificó.
+  La clave personal `id_ed25519` no se modificó. `ssh -T` OK.
+- **Python 3.14.4 aprobado**: se instaló en `.venv` y se verificó
+  importación y ejecución real de pandas 3.0.6, numpy 2.5.4, geopandas 1.2.0,
+  shapely 2.2.0, pyproj 3.8.0, scikit-learn 1.9.1, catboost 1.2.10, fastapi
+  0.143.0, pydantic 2.14.1. CatBoost entrena en CPU (smoke sintético) y
+  Shapely lee el EWKB real del CSV (área consistente con el dato tabular).
+  **No fue necesario el fallback Python 3.13** (descartado, sin instalar).
 - Estrategia ML: **Ruta B** — todo el producto funciona en modo
   `ANALISIS_SIN_MODELO`; experimentos proxy con avalúo total/ha en rama
   experimental separada, jamás promovidos a modelo oficial de suelo sin
   etiqueta validada.
 - VPS diferido: se entregará Docker Compose + Nginx + runbooks listos.
+- Frontend: Vite 8 + React 19 + TS, react-router-dom 7, TanStack Query 5,
+  leaflet 1.9 + react-leaflet 5, plotly.js 4 + react-plotly.js, vitest 5,
+  oxlint (lint). ESLint/Prettier eliminados para no duplicar oxlint.
 
 ### Tareas completadas
 
 - [x] Estructura de directorios según guía maestra §5.4.
 - [x] `README.md`, `.gitignore`, `.editorconfig`, `.env.example`, `Makefile`,
       CI (`ci.yml`: ruff + pytest + build frontend).
-- [x] `docs/ESTADO_PROYECTO.md`, `docs/pendientes.md`, `docs/decisions/`.
+- [x] `docs/ESTADO_PROYECTO.md`, `docs/pendientes.md`, `docs/decisions/` +
+      ADR-0001; copia de la guía maestra a `docs/00_contexto_maestro.md`.
 - [x] SSH dedicada + alias verificados (`ssh -T` → "Hi valensan18!").
-- [x] `git init -b dev`, identidad local, `remote add origin` (URL exacta).
-- [x] `git fetch` + base sobre `origin/main`.
-
-### Tareas pendientes de la fase
-
-- [ ] Copiar CSV originales a `data/raw/` con SHA-256 + `data_manifest.json`.
-- [ ] Entorno Python (venv) + verificación real de GeoPandas/CatBoost.
-- [ ] Frontend Vite React+TS + dependencias + lockfile.
-- [ ] Comprobaciones: ruff, pytest (smoke), build frontend, `git check-ignore`.
-- [ ] Commits locales (sin push hasta autorización).
+- [x] `git init -b dev`, identidad local, `remote add origin` (URL exacta),
+      base sobre `origin/main`.
+- [x] CSV originales copiados a `data/raw/` con SHA-256 + `data_manifest.json`
+      (originales del Desktop intactos).
+- [x] Entorno Python 3.14 + verificación real de GeoPandas/CatBoost.
+- [x] Frontend Vite React+TS + dependencias + lockfile + proxy `/api`.
+- [x] Comprobaciones: `ruff check .` limpio; `pytest` 4 passed (backend +
+      contrato de etiqueta); `oxlint` limpio; `vitest` 1 passed;
+      `npm run build` OK.
+- [x] Commit local en `dev` con autor verificado (`valensan18` + noreply).
+      **Sin push** (pendiente autorización expresa).
 
 ### Errores / problemas encontrados
 
+- `catboost_info/` (logs del smoke de CatBoost) se coló al staging inicial:
+  corregido añadiéndolo a `.gitignore` y eliminándolo del índice/disco antes
+  del commit.
 - `gh auth login` indicado como completado por el usuario no persistió:
   `%APPDATA%\GitHub CLI\hosts.yml` no existe y `gh auth status` reporta sin
   sesión. **Pendiente** retomar el login para verificar privacidad y
@@ -59,10 +73,8 @@ su criterio de aceptación.
 - El PDF de Jesús (`PROYECTO REALIZADO POR JESUS.pdf`) no tiene capa de
   texto; su contenido se usa vía resumen de la guía maestra §2. OCR solo si
   se requiere.
-
-### Decisiones pendientes de usuario/director
-
-- Ver `docs/pendientes.md` (etiqueta de suelo, diccionario, fechas, permisos).
+- Advertencia (no bloqueante): `starlette.testclient` sugiere migrar a
+  `httpx2`; los tests actuales pasan con httpx 0.28.1. Revisar en Fase 3.
 
 ---
 
