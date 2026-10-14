@@ -4,6 +4,7 @@ Las pruebas que requieren la base local se omiten en CI (sin datos).
 """
 
 import json
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -149,7 +150,11 @@ class TestDatasetYSmoke:
                   for n, m in metrics_a["protocols"]["spatial"]["test"].items()}
         maes_b = {n: m["mae_cop_ha"]
                   for n, m in metrics_b["protocols"]["spatial"]["test"].items()}
-        assert maes_a == maes_b
+        assert set(maes_a) == set(maes_b)
+        for name in maes_a:
+            # RandomForest con n_jobs>1 suma en orden no determinista:
+            # reproducibilidad se exige dentro de tolerancia relativa.
+            assert math.isclose(maes_a[name], maes_b[name], rel_tol=1e-6), name
         assert set(maes_a) == {"dummy", "ridge", "tree", "forest", "catboost"}
         assert all(np.isfinite(v) for v in maes_a.values())
 

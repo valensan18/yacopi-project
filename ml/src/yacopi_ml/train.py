@@ -379,17 +379,18 @@ def run(args) -> dict:
         "model_card": model_card,
     })
 
-    register_experiment(experiment_id, {
-        "modelo": selected,
-        "mae_test_espacial_cop_ha": round(
-            results[selected]["test_spatial"]["mae_cop_ha"], 2
-        ),
-        "r2_test_espacial": round(
-            results[selected]["test_spatial"]["r2"], 4
-        ),
-        "etiqueta": contract["label_name"],
-        "production_eligible": False,
-    })
+    if not args.smoke:
+        register_experiment(experiment_id, {
+            "modelo": selected,
+            "mae_test_espacial_cop_ha": round(
+                results[selected]["test_spatial"]["mae_cop_ha"], 2
+            ),
+            "r2_test_espacial": round(
+                results[selected]["test_spatial"]["r2"], 4
+            ),
+            "etiqueta": contract["label_name"],
+            "production_eligible": False,
+        })
 
     print(f"\nArtefactos en: {exp_dir}")
     print(json.dumps(metrics_payload, ensure_ascii=False, indent=2, default=str))
