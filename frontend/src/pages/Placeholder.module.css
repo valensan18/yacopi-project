@@ -1,0 +1,21 @@
+.page {
+  padding-block: var(--s7);
+  min-height: 60vh;
+}
+
+.title {
+  font-size: var(--fs-display);
+  margin-top: var(--s2);
+}
+
+.description {
+  max-width: 40rem;
+  margin-top: var(--s3);
+  color: var(--stone);
+  font-size: 1.1rem;
+}
+
+.eta {
+  margin-top: var(--s4);
+  color: var(--copper);
+}

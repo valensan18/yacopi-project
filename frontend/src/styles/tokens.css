@@ -1,0 +1,65 @@
+:root {
+  /* ===== Capa 1 · Primitivas (valores crudos) =====
+     Paleta ATLAS VIVO (docs/DESIGN_SYSTEM.md §2) */
+  --ink: #0b1613;
+  --ink-2: #101f1a;
+  --pine: #1e4d3b;
+  --moss: #2f6b52;
+  --copper: #c97b4a;
+  --amber-data: #e8b44f;
+  --chalk: #f4efe6;
+  --stone: #8fa39a;
+  --paper: #f6f1e7;
+  --sepia: #2a2118;
+  --grid: #1c2b25;
+
+  /* ===== Capa 2 · Semántica (propósito) ===== */
+  --color-bg: var(--ink);
+  --color-surface: var(--ink-2);
+  --color-primary: var(--pine);
+  --color-primary-strong: var(--moss);
+  --color-accent: var(--copper);
+  --color-accent-hover: #d98c58;
+  --color-warning: var(--amber-data);
+  --color-on-accent: var(--ink);
+  --color-text: var(--chalk);
+  --color-text-muted: var(--stone);
+  --color-border: rgba(244, 239, 230, 0.08);
+  --color-border-accent: rgba(201, 123, 74, 0.5);
+
+  /* Tipografía (docs/DESIGN_SYSTEM.md §3) */
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-body: 'Public Sans Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', Consolas, monospace;
+
+  --fs-display: clamp(2.4rem, 1.2rem + 6vw, 5.5rem);
+  --fs-h2: clamp(1.8rem, 1.2rem + 2.4vw, 3rem);
+  --fs-h3: clamp(1.3rem, 1.05rem + 1vw, 1.8rem);
+  --fs-body: 1.0625rem;
+  --fs-data: clamp(1.4rem, 1.1rem + 1.4vw, 2.6rem);
+  --fs-mono: 0.8125rem;
+
+  /* Espaciado base 8px */
+  --s1: 0.5rem;
+  --s2: 1rem;
+  --s3: 1.5rem;
+  --s4: 2rem;
+  --s5: 3rem;
+  --s6: 4rem;
+  --s7: 6rem;
+  --s8: 8rem;
+
+  /* ===== Capa 3 · Componente ===== */
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.35);
+  --shadow-nav: 0 1px 0 rgba(244, 239, 230, 0.08);
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-reveal: 0.7s;
+  --dur-micro: 0.22s;
+
+  color-scheme: dark;
+}

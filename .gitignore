@@ -57,3 +57,6 @@ Thumbs.db
 .DS_Store
 .idea/
 .vscode/
+
+# ===== Herramientas locales del agente (skills, comandos) =====
+.opencode/

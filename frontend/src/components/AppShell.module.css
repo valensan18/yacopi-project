@@ -1,0 +1,140 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: 0.9rem var(--s2);
+  background: rgba(11, 22, 19, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.08);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: var(--chalk);
+}
+
+.brand {
+  color: var(--copper);
+  display: grid;
+  place-items: center;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.16em;
+  line-height: 1.1;
+}
+
+.logoText small {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--stone);
+}
+
+.nav {
+  margin-left: auto;
+  display: flex;
+  gap: var(--s2);
+}
+
+.link {
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--stone);
+  padding: 0.3rem 0;
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur-micro) ease;
+}
+
+.link:hover {
+  color: var(--chalk);
+}
+
+.active {
+  color: var(--chalk);
+  border-bottom-color: var(--copper);
+}
+
+.menuButton {
+  display: none;
+  margin-left: auto;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0.5rem;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.menuButton span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--chalk);
+  border-radius: 2px;
+  transition: transform var(--dur-micro) ease;
+}
+
+.mobileMenu {
+  position: fixed;
+  inset: 0;
+  top: 3.9rem;
+  z-index: 55;
+  background: var(--ink-2);
+  display: flex;
+  flex-direction: column;
+  padding: var(--s3);
+  gap: var(--s2);
+}
+
+.mobileLink {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  color: var(--stone);
+  text-decoration: none;
+}
+
+.footer {
+  margin-top: auto;
+  padding-block: var(--s4);
+  border-top: 1px solid rgba(244, 239, 230, 0.08);
+  background: var(--ink-2);
+}
+
+.footerText {
+  font-size: 0.9rem;
+  color: var(--stone);
+  max-width: 56rem;
+}
+
+.footerMono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  color: var(--stone);
+  opacity: 0.75;
+}
+
+@media (max-width: 1023px) {
+  .nav {
+    display: none;
+  }
+  .menuButton {
+    display: flex;
+  }
+}
