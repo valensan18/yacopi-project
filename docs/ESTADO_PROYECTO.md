@@ -269,6 +269,59 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## FASE 4 — Frontend ATLAS VIVO (COMPLETADA funcionalmente 2026-10-14)
+
+### Decisiones tomadas
+
+- Dirección visual aprobada por el usuario: **A — ATLAS VIVO (cartografía
+  cinematográfica)** con acentos de B (densidad tabular GEO LAB en Predios)
+  y C (ritmo editorial TERRITORIO en Metodología).
+- Sistema de diseño formalizado en `docs/DESIGN_SYSTEM.md`: paleta mineral
+  (verde profundo/cobre/marfil), Fraunces + Public Sans + JetBrains Mono,
+  tokens de 3 capas (primitiva→semántica→componente), 8 px de espaciado.
+- Skills de diseño del proyecto (`.opencode/skills/`) aplicadas: búsquedas
+  de `ui-ux-pro-max` (design-system + dominios gsap/threejs/ux/landing)
+  validaron la implementación (Points+BufferGeometry, fog, parallax solo
+  decorativo, contraste AA, patrones de aterrizaje). Se descartó la paleta
+  "Cyberpunk" sugerida genéricamente por no ajustarse a la dirección
+  aprobada (la skill exige verificar pertinencia).
+- Motores de animación: Lenis (solo Inicio) + GSAP/ScrollTrigger (scroll) +
+  Motion (microinteracciones). 3D solo en Inicio (React Three Fiber,
+  lazy). Leaflet y Plotly lazy por página. `prefers-reduced-motion` y
+  fallback sin WebGL implementados.
+- Banner de estado: compacto en escritorio; en móvil muestra resumen
+  "Modelo predictivo pendiente de validación" + botón "Ver detalles"
+  (aria-expanded, operable por teclado).
+
+### Pantallas implementadas (rutas reales)
+
+| Ruta | Contenido |
+|---|---|
+| `/` | Portada 3D + narrativa (aprobada, sin cambios de fondo) |
+| `/predios` | Catálogo 7.709 predios: paginación real, filtros (destino, subzona, rangos de área), orden, búsqueda exacta por public_id, URL sincronizada, tabla GEO LAB |
+| `/predios/:public_id` | Ficha: identificador, superficies, coordenadas, mini-mapa (si hay coords), atributos ZHF/CLC, banderas con etiquetas, nulos = "No disponible", sin avalúos |
+| `/mapa` | Leaflet con capa canvas, bbox sincronizado con la API, leyenda por destino con mostrar/ocultar, popup → ficha, atribución CARTO/OSM, aviso "puntos, no polígonos" |
+| `/exploracion` | Plotly: destino, subzona, histograma de áreas, donut de construcción, cobertura/calidad; títulos, unidades, origen y resumen accesible |
+| `/modelos` | Estado oficial (label_pending), experimento proxy (métricas reales vía API), tabla documentada espacial vs aleatoria, avalúo total/ha vs suelo, advertencias |
+| `/prediccion` | Bloqueo oficial con comprobación real (503), experimental desactivada por defecto con explicación; formulario tipado solo si el backend la habilita |
+| `/metodologia` | Editorial CRISP-DM con línea de tiempo, fuentes, calidad, variables, evaluación espacial, limitaciones del proxy, validación pendiente |
+| `/acerca-de` | Propósito, contexto académico (sin nombres), alcance, arquitectura, tecnologías, limitaciones |
+
+### Verificación
+
+- 10 pruebas frontend (vitest) pasan: portada, banner, fallback 2D,
+  catálogo, detalle con nulos, modelos, predicción, metodología.
+- `oxlint` limpio; `tsc -b && vite build` OK (3D lazy ≈242 kB gzip;
+  Leaflet/Plotly en chunks separados).
+- 8 rutas responden 200 con los servidores reales; proxy API verificado;
+  POST oficial devuelve 503 real.
+- Capturas en `docs/capturas/` (home desktop/móvil + 6 pantallas).
+- Limitación documentada: la búsqueda de predios es por public_id exacto
+  (el endpoint actual no filtra por prefijo; ampliación futura requiere
+  cambio mínimo compatible del contrato, pendiente de autorización).
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
@@ -276,7 +329,7 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 | 1. Validación final de datos | **Completada** | — |
 | 2. Modelos (Ruta B) | **Completada (experimental)** | Modelo oficial sigue pendiente de etiqueta |
 | 3. Backend FastAPI | **Completada** | — |
-| 4. Frontend React | No iniciada | — |
+| 4. Frontend React | **Completada funcionalmente** | Pendiente revisión visual del usuario |
 | 5. Integración | No iniciada | — |
 | 6. Pruebas y rendimiento | No iniciada | — |
 | 7. Despliegue VPS | No iniciada | Sin VPS (diferido) |
