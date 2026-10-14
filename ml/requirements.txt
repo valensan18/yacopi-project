@@ -10,5 +10,6 @@ catboost>=1.2
 matplotlib>=3.9
 pyarrow>=17.0
 joblib>=1.4
+shap>=0.53
 pytest>=8.0
 ruff>=0.7

@@ -1,0 +1,22 @@
+# Contrato de etiqueta del EXPERIMENTO PROXY (Ruta B).
+# Este archivo NO reemplaza label_contract.yaml (que sigue pending_verification).
+# Los artefactos generados con este contrato son EXPERIMENTALES: jamás se
+# promueven a producción mientras no exista una etiqueta verificada de valor
+# exclusivo de terreno.
+label_name: proxy_avaluo_total_cop_ha
+unit: COP/ha
+source_status: research_proxy            # experimental, nunca production
+source_kind: proxy
+source_file: 03_predios_consolidados.csv
+source_column: referencia_avaluo_total_por_ha_cop
+reference_date: null
+area_column_used: area_terreno_catastral_m2
+construction_value_excluded: false
+approved_by: null
+approval_note: null
+production_eligible: false
+notes: >
+  Avalúo catastral TOTAL dividido entre el área catastral (x 10.000).
+  Incluye potencialmente el valor de construcciones (3.033 predios con
+  area_construida_m2 > 0) y NO acredita un valor exclusivo del terreno.
+  Solo análisis experimental y comparación metodológica.
