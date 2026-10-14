@@ -78,11 +78,78 @@ su criterio de aceptación.
 
 ---
 
-## FASES 1–8 — No iniciadas
+## FASE 1 — Validación final de datos y base SQLite (COMPLETADA 2026-10-14)
+
+### Decisiones tomadas
+
+- **Reutilización del pipeline heredado**: `scripts/preparar_datos.py` se copió
+  sin modificaciones funcionales y se conserva byte-idéntico como referencia
+  de reproducibilidad (excluido de ruff vía `pyproject.toml`, justificado en
+  el propio archivo). Ver ADR-0002.
+- **Reproducibilidad confirmada**: al ejecutarlo sobre `data/raw/` produce
+  exactamente el diagnóstico de referencia (24 claves comparadas, 0
+  diferencias): 7.709 predios consolidados, 7.694 coincidentes, 227
+  solo-ZHF, 15 solo-intersecciones.
+- **CRS verificado**: `geometria`/`geometria_interseccion` → SRID 9377;
+  `geom` ZHF → SRID 3116 (100 % de las filas auditadas). Mapas exportados a
+  EPSG:4326: 7.694 puntos referenciales y 7.968 polígonos simplificados
+  (15 m), 0 inválidos.
+- **SQLite** (`data/parcels.db`, no versionado): 7 tablas (parcels 7.709,
+  parcel_features 7.709, parcel_value_references 46.224, quality_flags
+  15.489, model_targets 0, zhf_only_parcels 227, dataset_meta 9).
+  `public_id` opaco determinista (`p_` + SHA-256[:16] del numero_predial);
+  los identificadores oficiales permanecen solo en la base local.
+- **Allowlist/excluidas** actualizadas con cardinalidades y nulos reales en
+  `ml/config/features.yaml`; diccionario completo en
+  `docs/02_diccionario_datos.md`. La variable objetivo sigue
+  `pending_verification`; estrategia Ruta B intacta.
+
+### Tareas completadas
+
+- [x] Pipeline heredado reproducido; conteos idénticos a la referencia.
+- [x] `scripts/verify_inputs.py`: hashes SHA-256, tamaños, encabezados y
+      conteos de los CSV originales (OK).
+- [x] `scripts/audit_data.py`: reejecuta el pipeline, compara contra la
+      referencia y calcula nulos, unicidad, rangos de coordenadas y banderas;
+      escribe `08_validacion_fase1.json`.
+- [x] `scripts/build_maps.py`: auditoría de SRID + GeoJSON Leaflet (puntos y
+      polígonos WGS84).
+- [x] `scripts/build_db.py`: construcción reproducible de SQLite.
+- [x] `docs/02_diccionario_datos.md`: 49 columnas documentadas con origen,
+      tipo, unidades, nulos, cardinalidad y rol.
+- [x] 17 pruebas automatizadas (integridad, unicidad, coordenadas, SRID,
+      DB, mapas, reproducibilidad doble corrida, verificación de entradas,
+      contrato de etiqueta); `ruff` limpio.
+
+### Hallazgos de validación (reales, sin eliminaciones)
+
+- 15 predios sin coincidencia ZHF → sin coordenadas ni atributos ZHF/CLC.
+- `fa_element` con 471 vacíos y `aht_vpoten` con 40 (fuera de los 15).
+- `N/A` en CLC niveles 4–6 es categoría original (6.100–7.510 predios).
+- 4.924 predios con diferencia >5 % entre área ZHF y área catastral;
+  843 con zona ZHG discordante; ninguna fila eliminada (solo banderas).
+- Coordenadas: 7.694 válidas, 0 fuera de rango Colombia.
+- Deprecación `shapely.ops.transform` → migrado a `shapely.transform(...
+  interleaved=False)` compatible con pyproj.
+
+### Errores / problemas encontrados (ya resueltos)
+
+- `shapely.transform` en modo intercalado es incompatible con la firma
+  `transform(xx, yy)` de pyproj → corregido con `interleaved=False`.
+- YAML de `features.yaml` corrompido por doble codificación al editarlo vía
+  PowerShell → reescrito limpio; barrido global sin mojibake.
+
+### Pendientes que permanecen
+
+- Ver `docs/pendientes.md` (etiqueta, diccionario oficial, fechas, permisos).
+
+---
+
+## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
 |---|---|---|
-| 1. Validación final de datos | No iniciada | Requiere autorización tras Fase 0 |
+| 1. Validación final de datos | **Completada** | — |
 | 2. Modelos (Ruta B) | No iniciada | Etiqueta pendiente (solo proxy experimental) |
 | 3. Backend FastAPI | No iniciada | — |
 | 4. Frontend React | No iniciada | — |

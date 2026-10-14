@@ -14,3 +14,6 @@ independientes.
 | 6 | Login de `gh` CLI como valensan18 | Verificar `private=true` y colaboradores del repo | Usuario | `gh auth status` muestra valensan18 | EN PROCESO |
 | 7 | VPS para Fase 7 | Despliegue real | Usuario | Proveedor y accesos disponibles | DIFERIDO (acordado) |
 | 8 | Confirmar que GitHub acepta el correo noreply `342352447+valensan18@users.noreply.github.com` | Atribución de commits | Usuario | Settings → Emails con "Keep my email addresses private" activo; verificar commit publicado | ABIERTO |
+| 9 | 15 predios sin coincidencia ZHF (sin coordenadas ni atributos ZHF/CLC) | Cobertura de mapa y de features X | Fuente de datos | Explicación de por qué faltan en ZHF o archivo con sus atributos | ABIERTO |
+| 10 | `fa_element` con 471 vacíos y `aht_vpoten` con 40: decidir imputación o exclusión como X | Selección de variables (Fase 2) | Equipo ML | Documentar regla de manejo de faltantes antes de entrenar | ABIERTO |
+| 11 | `SINAP_NOMB`/`SINAP_CATE` no usados aún: evaluar como X | Cobertura de variables ambientales | Equipo ML | Decisión en Fase 2 con diccionario oficial | ABIERTO |
