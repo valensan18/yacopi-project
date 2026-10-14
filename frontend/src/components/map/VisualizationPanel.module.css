@@ -1,0 +1,141 @@
+.panel {
+  background: rgba(16, 31, 26, 0.92);
+  border: 1px solid rgba(244, 239, 230, 0.1);
+  border-radius: var(--r-md);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: 0;
+  color: var(--chalk);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.7rem var(--s2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.header:hover {
+  color: var(--copper);
+}
+
+.chevron {
+  color: var(--copper);
+  font-family: var(--font-mono);
+}
+
+.body {
+  padding: var(--s2);
+  border-top: 1px solid rgba(244, 239, 230, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.control label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--stone);
+  margin-bottom: 0.3rem;
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.sliderRow input[type='range'] {
+  flex: 1;
+  accent-color: var(--copper);
+  height: 1.6rem;
+  cursor: pointer;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  color: var(--copper);
+  min-width: 3.2rem;
+  text-align: right;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.checkRow input {
+  accent-color: var(--copper);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+}
+
+.actions button {
+  flex: 1;
+  min-width: 8rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  min-height: 2.6rem;
+}
+
+.primary {
+  background: var(--copper);
+  color: var(--ink);
+  border: 0;
+  font-weight: 600;
+}
+
+.primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.secondary {
+  background: none;
+  border: 1px solid rgba(244, 239, 230, 0.3);
+  color: var(--chalk);
+}
+
+.secondary:hover {
+  border-color: var(--copper);
+}
+
+.summary {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-top: 1px solid rgba(244, 239, 230, 0.08);
+  padding-top: var(--s2);
+}
+
+.summary dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--stone);
+}
+
+.summary dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  color: var(--chalk);
+}

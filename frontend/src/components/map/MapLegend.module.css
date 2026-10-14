@@ -1,0 +1,107 @@
+.panel {
+  background: rgba(16, 31, 26, 0.92);
+  border: 1px solid rgba(244, 239, 230, 0.1);
+  border-radius: var(--r-md);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s2);
+  width: 100%;
+  background: none;
+  border: 0;
+  color: var(--chalk);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.7rem var(--s2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.header:hover {
+  color: var(--copper);
+}
+
+.headerMeta {
+  color: var(--stone);
+  font-weight: 400;
+}
+
+.chevron {
+  color: var(--copper);
+  font-family: var(--font-mono);
+}
+
+.body {
+  padding: 0 var(--s2) var(--s2);
+  border-top: 1px solid rgba(244, 239, 230, 0.08);
+  padding-top: var(--s2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.note {
+  font-size: 0.75rem;
+  color: var(--stone);
+  margin: 0 0 var(--s1);
+}
+
+.actions {
+  display: flex;
+  gap: var(--s1);
+  margin-bottom: var(--s1);
+}
+
+.actions button {
+  background: none;
+  border: 1px solid rgba(244, 239, 230, 0.25);
+  color: var(--stone);
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.actions button:hover {
+  border-color: var(--copper);
+  color: var(--chalk);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+  cursor: pointer;
+}
+
+.row input {
+  accent-color: var(--copper);
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--stone);
+}

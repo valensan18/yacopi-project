@@ -326,6 +326,24 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
   (el endpoint actual no filtra por prefijo; ampliación futura requiere
   cambio mínimo compatible del contrato, pendiente de autorización).
 
+### Fase 4.1 — Pulido profesional del mapa (completada)
+
+- Panel "Visualización": opacidad (15–100 %, inicial 70 %), tamaño
+  (1,5–7 px, inicial 3,2 px) con ajuste adaptativo opcional según zoom,
+  "Restablecer visualización" y "Ver todo el territorio" (fitBounds sobre
+  los registros cargados). Valores en mono; sin refetch ni reconstrucción
+  de marcadores al mover sliders (setStyle + rAF).
+- Leyenda mejorada: categorías colapsables con conteos de la vista actual,
+  mostrar/ocultar individual, "Mostrar todas"/"Ocultar todas".
+- Contadores honestos: total del sistema vs registros con coordenadas vs
+  cargados en la vista vs visibles tras filtro (definiciones visibles).
+- Conservado: renderer canvas, consulta por bbox con micro-retardo,
+  popups, CARTO Dark Matter + respaldo OSM, atribuciones.
+- Verificación funcional con Playwright (script `frontend/scripts/verify-map.mjs`)
+  contra los servidores reales: sliders aplican y resetean, zoom nativo
+  funciona, leyenda colapsa y filtra, 62 teselas CARTO 200 (0 fallidas) en
+  escritorio y 16 en móvil, 0 errores de consola. Pruebas unitarias 16/16.
+
 ---
 
 ## FASES 1–8 — Estado

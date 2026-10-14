@@ -84,6 +84,34 @@ a {
   background-size: 48px 48px;
 }
 
+/* Popup de predio dentro del mapa Leaflet (DOM fuera de React) */
+.map-popup {
+  font-family: var(--font-body);
+  color: #1c211f;
+  min-width: 11rem;
+}
+
+.map-popup p {
+  margin: 0 0 0.3rem;
+}
+
+.map-popup-id {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #1e4d3b;
+}
+
+.map-popup-sub {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #555f5a;
+}
+
+.map-popup a {
+  color: #1e4d3b;
+  font-weight: 600;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
