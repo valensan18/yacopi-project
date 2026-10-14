@@ -206,13 +206,76 @@ su criterio de aceptación.
 
 ---
 
+## FASE 3 — Backend FastAPI (COMPLETADA 2026-10-14)
+
+### Decisiones tomadas
+
+- Arquitectura modular: `core` (config/errores), `db` (conexión read-only +
+  repositorio), `schemas`, `routers` (7 módulos), `services` (predicción).
+  Ver ADR-0004.
+- Doble canal de predicción: oficial `POST /predictions` → **503
+  MODEL_NOT_READY** (etiqueta pendiente); experimental
+  `POST /predictions/experimental` → proxy RandomForest, desactivado por
+  defecto (`EXPERIMENTAL_INFERENCE_ENABLED=false`), solo desarrollo local,
+  con disclaimer explícito (no es suelo, no es avalúo). Pendiente #13
+  resuelto con la opción conservadora.
+- Artefacto cargado UNA vez en `lifespan` tras verificar procedencia
+  (joblib + feature_schema + training_manifest research-proxy + metrics);
+  nunca se reentrena por petición.
+- `public_id` opaco en todas las respuestas; `parcel_source_id` y las
+  referencias económicas no se exponen.
+- Validación Pydantic en firma (422 `INVALID_INPUT` normalizado), errores
+  `{error:{code,message,details,request_id}}`, paginación tope 100, sort con
+  lista blanca, bbox acotado, SQL parametrizada, CORS restrictivo.
+
+### Endpoints verificados con datos reales
+
+`/health/live|ready`, `/system/status` (label_pending),
+`/properties` (total 7.709; filtro Agropecuario 6.746),
+`/properties/{public_id}` (+features y flags), `/statistics/overview`
+(3.033 con construcción, 7.694 con coordenadas), `/statistics/distributions`,
+`/maps/points` (GeoJSON EPSG:4326), `/models` (solo exp-proxy-001,
+experimental), `/models/active`, `/predictions` (503), 
+`/predictions/experimental` (200 con flag; predicción reproducible).
+
+### Rendimiento medido (i7-9700 local, n=100, servidor con 1 worker)
+
+| Endpoint | p50 | p95 | p99 |
+|---|---:|---:|---:|
+| health/live | 1,4 ms | 1,9 ms | 2,1 ms |
+| system/status | 2,0 ms | 2,7 ms | 3,8 ms |
+| properties (20) | 3,0 ms | 3,5 ms | 3,9 ms |
+| properties filtradas | 5,2 ms | 5,8 ms | 5,9 ms |
+| statistics/overview | 8,2 ms | 9,0 ms | 9,5 ms |
+| maps/points (1.000) | 5,6 ms | 7,0 ms | 27,1 ms |
+| predicción experimental (RF 349 árboles) | 59,2 ms | 68,7 ms | 70,9 ms |
+
+0 errores en todas las series. Script reproducible: `scripts/benchmark_api.py`.
+
+### Pruebas
+
+58 pruebas totales pasan (27 nuevas de API con base sintética: paginación,
+filtros, 422/404/503, GeoJSON, bloqueo oficial, experimental on/off,
+reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
+
+### Errores encontrados y resueltos
+
+- Validación Pydantic dentro del handler no disparaba el manejador 422 →
+  movida a la firma (`ExperimentalRequest.features: PredictionFeatures`).
+- Las corridas smoke de las pruebas contaminaban `registry.json` real →
+  los smoke ya no registran experimentos; registro depurado a
+  `exp-proxy-001`.
+- Health/ready simplificado (sin estados confusos).
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
 |---|---|---|
 | 1. Validación final de datos | **Completada** | — |
 | 2. Modelos (Ruta B) | **Completada (experimental)** | Modelo oficial sigue pendiente de etiqueta |
-| 3. Backend FastAPI | No iniciada | — |
+| 3. Backend FastAPI | **Completada** | — |
 | 4. Frontend React | No iniciada | — |
 | 5. Integración | No iniciada | — |
 | 6. Pruebas y rendimiento | No iniciada | — |
