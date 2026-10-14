@@ -1,0 +1,17 @@
+.header {
+  padding-top: var(--s7);
+  margin-bottom: var(--s5);
+}
+
+.title {
+  font-size: var(--fs-display);
+  margin-top: var(--s2);
+  max-width: 24ch;
+}
+
+.lede {
+  max-width: 44rem;
+  margin-top: var(--s3);
+  color: var(--stone);
+  font-size: 1.1rem;
+}

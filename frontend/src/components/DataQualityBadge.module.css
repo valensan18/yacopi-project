@@ -1,0 +1,21 @@
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.ok {
+  color: var(--moss);
+  background: rgba(47, 107, 82, 0.16);
+  border: 1px solid rgba(47, 107, 82, 0.4);
+}
+
+.warn {
+  color: var(--amber-data);
+  background: rgba(232, 180, 79, 0.1);
+  border: 1px solid rgba(232, 180, 79, 0.4);
+}

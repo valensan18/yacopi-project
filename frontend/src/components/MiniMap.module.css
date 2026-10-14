@@ -1,0 +1,7 @@
+.mapBox {
+  height: 16rem;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  margin-top: var(--s2);
+}

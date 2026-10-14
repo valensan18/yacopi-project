@@ -1,0 +1,92 @@
+.banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.55rem var(--s2);
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.08);
+  color: var(--chalk);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.pending {
+  background: rgba(232, 180, 79, 0.08);
+}
+.pending .dot {
+  background: var(--amber-data);
+}
+
+.ready {
+  background: rgba(47, 107, 82, 0.14);
+}
+.ready .dot {
+  background: var(--moss);
+}
+
+.error {
+  background: rgba(201, 123, 74, 0.16);
+  color: var(--copper);
+}
+
+.summary {
+  flex: 1;
+  min-width: 0;
+}
+
+.short {
+  display: none;
+}
+
+.detailsButton {
+  background: none;
+  border: 1px solid rgba(244, 239, 230, 0.3);
+  border-radius: var(--r-sm);
+  color: var(--chalk);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  white-space: nowrap;
+  display: none;
+}
+
+.detailsButton:hover {
+  border-color: var(--chalk);
+}
+
+.details {
+  flex-basis: 100%;
+  color: var(--stone);
+  font-size: 0.85rem;
+  display: none;
+}
+
+.detailsOpen {
+  display: block;
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  color: var(--stone);
+  white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  .short {
+    display: inline;
+  }
+  .full {
+    display: none;
+  }
+  .detailsButton {
+    display: inline-block;
+  }
+}

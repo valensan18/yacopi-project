@@ -1,0 +1,19 @@
+.disclaimer {
+  background: rgba(232, 180, 79, 0.06);
+  border: 1px solid rgba(232, 180, 79, 0.28);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  font-size: 0.95rem;
+  color: var(--chalk);
+}
+
+.title {
+  color: var(--amber-data);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: var(--s1);
+}
+
+.body p {
+  margin-bottom: var(--s1);
+}
