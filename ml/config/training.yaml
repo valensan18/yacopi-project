@@ -1,0 +1,10 @@
+# Configuración PROPUESTA de entrenamiento (guía §7.6). Ajustar tras baselines.
+random_state: 42
+n_jobs: 6
+validation: spatial_group_cv     # se comparará también random per-parcel
+n_splits: 5
+search: randomized
+n_iter_per_model: 20
+primary_metric: MAE
+secondary_metrics: [RMSE, R2, MdAPE, PCT_ERROR_LT_30]
+smoke_test_first: true

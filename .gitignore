@@ -1,0 +1,58 @@
+# .gitignore — yacopi-project
+
+# ===== Python =====
+.venv/
+.venv313/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# ===== Node / frontend =====
+node_modules/
+frontend/dist/
+frontend/coverage/
+*.tsbuildinfo
+
+# ===== Secretos y credenciales =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+id_dsa*
+id_ecdsa*
+
+# ===== Datos sensibles (identificadores prediales, catastrales) =====
+data/raw/
+data/processed/
+data/external/
+data/splits/
+*.csv
+*.parquet
+*.gpkg
+*.geojson
+*.db
+*.sqlite
+*.sqlite3
+
+# ===== Artefactos ML =====
+ml/artifacts/
+catboost_info/
+*.joblib
+*.pkl
+*.cbm
+
+# ===== Sistema operativo / editores =====
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

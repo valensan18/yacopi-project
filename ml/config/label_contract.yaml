@@ -1,0 +1,14 @@
+# Contrato de etiqueta — BLOQUEANTE para entrenamiento en modo production.
+# No modificar este archivo solo para saltarse la validación.
+label_name: valor_terreno_cop_ha
+unit: COP/ha
+source_status: pending_verification   # pending_verification | verified | rejected
+source_file: null
+source_column: null
+source_kind: null                     # terreno_exclusivo | proxy | referencia_zonal
+reference_date: null
+area_column_used: null
+construction_value_excluded: null
+approved_by: null
+approval_note: null
+production_eligible: false
