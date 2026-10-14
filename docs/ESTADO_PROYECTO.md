@@ -145,12 +145,73 @@ su criterio de aceptación.
 
 ---
 
+## FASE 2 — Modelos: experimento proxy (Ruta B) (COMPLETADA 2026-10-14)
+
+### Decisiones tomadas
+
+- **Ruta B ejecutada como experimento separado**: etiqueta
+  `proxy_avaluo_total_cop_ha` (COP/ha, avalúo total/área), contrato
+  `label_contract_proxy.yaml` (`production_eligible: false`). El contrato
+  principal sigue `pending_verification`; `--mode production` **rechaza** el
+  entrenamiento (probado). Ver ADR-0003 y `docs/04_metodologia_ml.md`.
+- Cohorte ML: 7.694 predios coincidentes; 19 variables (5 numéricas + 14
+  categóricas con marcador `SIN_DATO`); `fa_element` excluido por cobertura.
+- Particiones congeladas (seed 42): aleatoria por predio y espacial
+  KMeans(25)+GroupShuffleSplit; tuning solo con GroupKFold(5) en train
+  espacial; test sellado usado una vez.
+- Modelos: Dummy(mediana), Ridge, Árbol, RandomForest, CatBoost.
+  Seleccionado **RandomForest** por menor MAE en test espacial.
+
+### Resultados reales (resumen; detalle en `docs/04_metodologia_ml.md`)
+
+| Modelo | MAE espacial | R² espacial | MAE aleatorio | R² aleatorio |
+|---|---:|---:|---:|---:|
+| Dummy | 6.592.762 | −0,03 | 7.889.929 | −0,02 |
+| Ridge | 15.196.282 | −0,11 | 13.581.815 | 0,40 |
+| Árbol | 4.215.432 | 0,53 | 4.176.143 | 0,66 |
+| **Forest** | **3.226.230** | **0,74** | **2.674.886** | **0,82** |
+| CatBoost | 3.730.373 | 0,76 | 3.336.590 | 0,81 |
+
+(COP/ha; test espacial n=1.353, aleatorio n=1.155)
+
+- Hallazgos: validación espacial claramente más exigente que la aleatoria;
+  Ridge colapsa (extrapolación lineal); el error se concentra en predios
+  ≤5 ha y en destinos no agropecuarios; con construcción el MAE se
+  multiplica ~7× → evidencia de que el proxy no es valor exclusivo de
+  terreno. Importancia (permutación y SHAP) dominada por áreas — relación
+  parcialmente mecánica con el denominador del proxy, declarada.
+- Artefactos en `ml/artifacts/exp-proxy-001/` (LOCALES, no versionados):
+  `model.joblib` (54 MB), `metrics.json`, `feature_schema.json`,
+  `training_manifest.json`, `predictions_test.csv`, `MODEL_CARD.md`
+  (EXPERIMENTAL) y 6 figuras reales.
+- Reproducibilidad: 1 comando (`python -m yacopi_ml.train --mode
+  research-proxy --output ml/artifacts/exp-proxy-001`); doble corrida smoke
+  idéntica (prueba).
+
+### Errores encontrados y resueltos
+
+- `pd.NA` en categóricas rompía SimpleImputer y CatBoost → marcador
+  `SIN_DATO` documentado.
+- CatBoost no clonable en sklearn (cat_features) → `CatBoostWrapper`.
+- SHAP fallaba sobre Pipeline → desenvuelve paso `model` y preprocesa la
+  muestra (OHE) antes del explainer.
+- Prueba de smoke mal indexada (claves ya resueltas del payload) → corregida.
+
+### Pendientes que permanecen
+
+- **Modelo de suelo oficial**: sigue bloqueado por etiqueta (pendientes #1–3).
+- Decisión del director sobre el valor académico del experimento proxy y
+  si autoriza experimentos adicionales (log(y), sin coordenadas, subset sin
+  construcción) — pendiente #12.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
 |---|---|---|
 | 1. Validación final de datos | **Completada** | — |
-| 2. Modelos (Ruta B) | No iniciada | Etiqueta pendiente (solo proxy experimental) |
+| 2. Modelos (Ruta B) | **Completada (experimental)** | Modelo oficial sigue pendiente de etiqueta |
 | 3. Backend FastAPI | No iniciada | — |
 | 4. Frontend React | No iniciada | — |
 | 5. Integración | No iniciada | — |
