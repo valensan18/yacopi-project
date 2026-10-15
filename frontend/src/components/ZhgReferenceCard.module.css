@@ -1,0 +1,174 @@
+.card {
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-lg);
+  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s2);
+  flex-wrap: wrap;
+}
+
+.kicker {
+  color: var(--copper);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.3rem;
+}
+
+.title {
+  font-size: var(--fs-h3);
+}
+
+.tag {
+  color: var(--amber-data);
+  border: 1px solid rgba(232, 180, 79, 0.4);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.singleValue {
+  font-family: var(--font-display);
+  font-size: var(--fs-data);
+  margin: 0;
+  color: var(--chalk);
+}
+
+.singleMeta {
+  color: var(--stone);
+  margin-top: 0.3rem;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 26rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.caption {
+  text-align: left;
+  color: var(--stone);
+  font-size: 0.85rem;
+  padding-bottom: var(--s1);
+}
+
+.table th {
+  text-align: left;
+  padding: 0.5rem var(--s2);
+  color: var(--stone);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: 0.5rem var(--s2);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.05);
+}
+
+.table tbody tr.dominant {
+  background: rgba(47, 107, 82, 0.14);
+}
+
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dominantNote {
+  color: var(--stone);
+  font-size: 0.85rem;
+  margin-top: var(--s1);
+}
+
+.consolidation {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--s2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+
+.coverageLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--stone);
+  margin: 0;
+}
+
+.coverageDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.consistente {
+  background: var(--moss);
+}
+
+.dudosa {
+  background: var(--amber-data);
+}
+
+.no_apta {
+  background: var(--copper);
+}
+
+.weighted {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.weighted strong {
+  color: var(--chalk);
+}
+
+.provisional {
+  color: var(--amber-data);
+}
+
+.statusNote {
+  display: block;
+  color: var(--stone);
+  font-size: 0.78rem;
+  margin-top: 0.2rem;
+}
+
+.noWeighted {
+  margin: 0;
+  color: var(--stone);
+  font-size: 0.9rem;
+}
+
+.limitations {
+  margin: 0;
+  padding-left: var(--s3);
+  color: var(--stone);
+  font-size: 0.82rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.note {
+  color: var(--stone);
+  font-size: 0.9rem;
+}

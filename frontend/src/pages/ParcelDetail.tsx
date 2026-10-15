@@ -6,6 +6,7 @@ import type { ParcelDetailItem, ParcelDetailResponse } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import { DataQualityBadge } from '../components/DataQualityBadge'
 import Disclaimer from '../components/Disclaimer'
+import ZhgReferenceCard from '../components/ZhgReferenceCard'
 import { EmptyState, ErrorState, LoadingSkeleton } from '../components/states'
 import { formatArea, formatCoordinates, NO_DATA } from '../lib/format'
 import styles from './ParcelDetail.module.css'
@@ -183,6 +184,8 @@ export default function ParcelDetail() {
               </dl>
             </section>
 
+            <ZhgReferenceCard publicId={item.public_id} />
+
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Alertas de calidad</h2>
               {item.quality_flags.length === 0 ? (
@@ -203,9 +206,11 @@ export default function ParcelDetail() {
           <aside className={styles.aside}>
             <Disclaimer title="Sobre los valores">
               <p>
-                Esta ficha muestra datos catastrales y territoriales descriptivos.{' '}
-                <strong>No se muestra ningún avalúo del suelo</strong>: la fuente no
-                permite respaldar un valor exclusivo del terreno para este predio.
+                Esta ficha muestra datos catastrales y territoriales descriptivos, más la
+                <strong> referencia zonal ZHG</strong> (dato económico territorial, no un
+                avalúo individual).{' '}
+                <strong>No se muestra un avalúo del suelo</strong>: la fuente no permite
+                respaldar un valor exclusivo del terreno para este predio.
               </p>
             </Disclaimer>
           </aside>

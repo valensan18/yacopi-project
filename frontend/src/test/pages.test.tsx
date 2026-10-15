@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -88,12 +89,53 @@ const modelsFixture = {
   disclaimer: 'Modelos experimentales',
 }
 
+const zhgReferenceFixture = {
+  public_id: 'p_abc123',
+  unit: 'COP/ha',
+  reference_type: 'zhg_zonal_reference',
+  zones: [
+    { zone_code: '03', value_cop_ha: 1368119.6, area_intersection_m2: 25000, share_pct: 50 },
+    { zone_code: '06', value_cop_ha: 547247.2, area_intersection_m2: 25000, share_pct: 50 },
+  ],
+  dominant_zone: {
+    zone_code: '06',
+    value_cop_ha: 547247.2,
+    share_pct: 50,
+    note: 'zona con mayor participación del predio; no representa automáticamente el valor unitario de toda la propiedad cuando hay varias zonas',
+  },
+  weighted_reference: null,
+  provisional_weighted_reference: {
+    value_cop_ha: 957683.4,
+    coverage_status: 'dudosa',
+    status_label: 'cálculo PROVISIONAL (cobertura dudosa 1–5 %): no es una consolidación validada',
+  },
+  coverage_status: 'dudosa',
+  source_description: 'valor_hectarea_agropecuario = ZHG_VALOR_ por zona',
+  reference_date: null,
+  limitations: [
+    'Referencia zonal catastral; no es un avalúo individual certificado del predio.',
+    'No es una predicción de aprendizaje automático.',
+  ],
+}
+
 function mockFetch(routes: Record<string, unknown>) {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input)
-      for (const [needle, payload] of Object.entries(routes)) {
+      const ordered = Object.entries(routes).sort(
+        (a, b) => b[0].length - a[0].length,
+      )
+      // prefiero la coincidencia más específica (sufijo exacto de la URL)
+      for (const [needle, payload] of ordered) {
+        if (url.endsWith(needle)) {
+          return new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+      }
+      for (const [needle, payload] of ordered) {
         if (url.includes(needle)) {
           return new Response(JSON.stringify(payload), {
             status: 200,
@@ -138,14 +180,24 @@ describe('Pantalla Predios', () => {
 })
 
 describe('Pantalla Detalle de predio', () => {
-  it('representa nulos como No disponible', async () => {
-    mockFetch({ '/properties/p_abc123': detailFixture })
+  it('representa nulos como No disponible y muestra la referencia ZHG', async () => {
+    mockFetch({
+      '/properties/p_abc123': detailFixture,
+      '/zhg-reference': zhgReferenceFixture,
+    })
     renderAt('/predios/:public_id', <ParcelDetail />, '/predios/p_abc123')
     await waitFor(() => {
       expect(screen.getAllByText('p_abc123').length).toBeGreaterThan(0)
     })
     expect(screen.getAllByText('No disponible').length).toBeGreaterThan(0)
     expect(screen.getByText('contiene_construccion')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        screen.getByText('Valor unitario de referencia del suelo'),
+      ).toBeInTheDocument()
+    })
+    expect(screen.getByText(/PROVISIONAL/)).toBeInTheDocument()
+    expect(screen.getByText('dato · no predicción')).toBeInTheDocument()
   })
 })
 
@@ -171,6 +223,27 @@ describe('Pantalla Predicción', () => {
     })
     expect(screen.getByText(/Predicción experimental: desactivada/)).toBeInTheDocument()
     expect(screen.getByText('Comprobar estado oficial (real)')).toBeInTheDocument()
+  })
+
+  it('consulta la referencia ZHG de un predio sin presentarla como predicción', async () => {
+    mockFetch({
+      '/system/status': statusFixture,
+      '/zhg-reference': zhgReferenceFixture,
+    })
+    renderAt('/prediccion', <Prediction />)
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Consulta de referencia de valor \(no es predicción\)/),
+      ).toBeInTheDocument()
+    })
+    const input = screen.getByLabelText('Identificador público del predio')
+    await userEvent.type(input, 'p_abc123')
+    await userEvent.click(screen.getByRole('button', { name: /Consultar referencia ZHG/ }))
+    await waitFor(() => {
+      expect(screen.getByText('Valor unitario de referencia del suelo')).toBeInTheDocument()
+    })
+    expect(screen.getByText('dato · no predicción')).toBeInTheDocument()
+    expect(screen.getByText(/Avalúo oficial · no emitido/)).toBeInTheDocument()
   })
 })
 

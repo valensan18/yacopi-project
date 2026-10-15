@@ -179,3 +179,67 @@
   color: var(--amber-data);
   font-size: 0.88rem;
 }
+
+.conceptTag {
+  color: var(--copper);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  margin: var(--s5) 0 var(--s1);
+}
+
+.conceptTag:first-of-type {
+  margin-top: 0;
+}
+
+.searchForm {
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  margin: var(--s2) 0 var(--s3);
+}
+
+.searchLabel {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--s1);
+}
+
+.searchRow {
+  display: flex;
+  gap: var(--s2);
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 15rem;
+  background: var(--ink);
+  color: var(--chalk);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-sm);
+  padding: 0.65rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+.searchInput:focus {
+  outline: 2px solid var(--copper);
+  outline-offset: 1px;
+}
+
+.searchButton {
+  background: var(--copper);
+  color: var(--ink);
+  border: 0;
+  border-radius: var(--r-sm);
+  padding: 0.65rem 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.searchButton:hover {
+  background: var(--color-accent-hover);
+}

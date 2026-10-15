@@ -99,3 +99,52 @@ export interface ApiErrorPayload {
     request_id?: string
   }
 }
+
+export interface ZoneReferenceItem {
+  zone_code: string
+  value_cop_ha: number
+  source_column: string
+}
+
+export interface ZhgZonesResponse {
+  items: ZoneReferenceItem[]
+  unit: string
+  reference_type: string
+  source_description: string
+  reference_date: null
+  limitations: string[]
+}
+
+export interface ParcelZoneItem {
+  zone_code: string
+  value_cop_ha: number | null
+  area_intersection_m2: number | null
+  share_pct: number | null
+}
+
+export interface DominantZone {
+  zone_code: string
+  value_cop_ha: number | null
+  share_pct: number | null
+  note: string
+}
+
+export interface WeightedReference {
+  value_cop_ha: number
+  coverage_status: string
+  status_label: string
+}
+
+export interface ZhgReferenceResponse {
+  public_id: string
+  unit: string
+  reference_type: string
+  zones: ParcelZoneItem[]
+  dominant_zone: DominantZone | null
+  weighted_reference: WeightedReference | null
+  provisional_weighted_reference: WeightedReference | null
+  coverage_status: string | null
+  source_description: string
+  reference_date: null
+  limitations: string[]
+}

@@ -22,7 +22,11 @@ async function auditPage(page, label) {
   })
   page.on('response', (res) => {
     if (res.url().includes('basemaps.cartocdn.com') && res.url().includes('.png')) {
-      res.status() === 200 ? cartoTiles.ok++ : cartoTiles.fail++
+      if (res.status() === 200) {
+        cartoTiles.ok += 1
+      } else {
+        cartoTiles.fail += 1
+      }
     }
   })
 

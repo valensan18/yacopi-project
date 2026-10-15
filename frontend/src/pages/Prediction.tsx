@@ -4,6 +4,7 @@ import { apiGet, apiPost, ApiError } from '../api/client'
 import type { SystemStatus } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
+import ZhgReferenceCard from '../components/ZhgReferenceCard'
 import { ErrorState, LoadingSkeleton } from '../components/states'
 import { formatCop, formatCopPerHa } from '../lib/format'
 import styles from './Prediction.module.css'
@@ -75,6 +76,51 @@ function BlockedOfficialCard({ onCheck }: { onCheck: () => void }) {
         Comprobar estado oficial (real)
       </button>
     </div>
+  )
+}
+
+function ZhgLookupSection() {
+  const [input, setInput] = useState('')
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault()
+    const id = input.trim()
+    if (id) setSelectedId(id)
+  }
+
+  return (
+    <section className={styles.expSection} aria-label="Consulta de referencia ZHG">
+      <p className={`mono ${styles.conceptTag}`}>
+        Referencia ZHG · dato económico territorial existente en la base
+      </p>
+      <h2 className={styles.sectionTitle}>Consulta de referencia de valor (no es predicción)</h2>
+      <p>
+        Consulta el valor unitario de referencia por zona geoeconómica de un predio,
+        expresado en COP/ha. Es un dato de las fuentes, no una estimación de
+        inteligencia artificial.
+      </p>
+      <form className={styles.searchForm} onSubmit={submit} role="search">
+        <label className={styles.searchLabel} htmlFor="zhg-public-id">
+          Identificador público del predio
+        </label>
+        <div className={styles.searchRow}>
+          <input
+            id="zhg-public-id"
+            className={styles.searchInput}
+            type="text"
+            placeholder="p_ab12cd34ef567890"
+            value={input}
+            maxLength={32}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button type="submit" className={styles.searchButton}>
+            Consultar referencia ZHG
+          </button>
+        </div>
+      </form>
+      {selectedId && <ZhgReferenceCard publicId={selectedId} />}
+    </section>
   )
 }
 
@@ -160,6 +206,11 @@ export default function Prediction() {
         lede="Estado honesto del sistema predictivo. No existen estimaciones simuladas: todo lo que se muestra proviene de respuestas reales de la API."
       />
 
+      <ZhgLookupSection />
+
+      <p className={`mono ${styles.conceptTag}`}>
+        Predicción ML · funcionalidad experimental no habilitada oficialmente
+      </p>
       <BlockedOfficialCard onCheck={() => officialCheck.mutate()} />
       {officialCheck.isPending && (
         <p className="mono" role="status">Consultando el endpoint oficial…</p>
@@ -303,6 +354,15 @@ export default function Prediction() {
           </>
         )}
       </section>
+
+      <p className={`mono ${styles.conceptTag}`}>
+        Avalúo oficial · no emitido por este software
+      </p>
+      <p className={styles.expNote}>
+        Atlas Vivo no expide avalúos catastrales ni valoraciones comerciales. Todo
+        valor mostrado es un dato de referencia o una estimación experimental de
+        apoyo académico.
+      </p>
     </div>
   )
 }
