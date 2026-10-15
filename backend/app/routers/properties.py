@@ -26,7 +26,9 @@ def _connect(request: Request) -> sqlite3.Connection:
     try:
         return get_connection(request.app.state.settings.database_path)
     except FileNotFoundError as exc:
-        raise InvalidQueryError(details={"razon": str(exc)}) from exc
+        raise InvalidQueryError(
+            details={"razon": "base de datos no disponible en este servidor"}
+        ) from exc
 
 
 @router.get("/properties", response_model=ParcelPage)
@@ -47,6 +49,11 @@ def list_properties(
     sort_desc: bool = False,
     limit: int = Query(default=20, ge=1),
     offset: int = Query(default=0, ge=0),
+    public_id_prefix: str | None = Query(
+        default=None, min_length=2, max_length=18,
+        pattern="^p_[0-9a-f]{0,16}$",
+        description="Prefijo de identificador público (búsqueda para el selector)",
+    ),
 ) -> ParcelPage:
     settings = request.app.state.settings
     if limit > settings.max_page_limit:
@@ -60,6 +67,7 @@ def list_properties(
             min_area=min_area_m2, max_area=max_area_m2,
             min_lat=min_lat, min_lon=min_lon,
             max_lat=max_lat, max_lon=max_lon,
+            public_id_prefix=public_id_prefix,
             sort=sort, sort_desc=sort_desc,
             limit=limit, offset=offset,
         )

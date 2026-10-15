@@ -54,7 +54,7 @@ class ExperimentalZhgService:
         for name in required:
             if not (self.artifact_dir / name).exists():
                 raise ExperimentalZhgUnavailableError(details={
-                    "artifact_dir": str(self.artifact_dir),
+                    "experimento": ARTIFACT_DIR,
                     "faltante": name,
                 })
 

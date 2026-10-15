@@ -35,6 +35,7 @@ def list_parcels(
     min_lon: float | None = None,
     max_lat: float | None = None,
     max_lon: float | None = None,
+    public_id_prefix: str | None = None,
     sort: str = "public_id",
     sort_desc: bool = False,
     limit: int = 20,
@@ -48,6 +49,9 @@ def list_parcels(
     if subzona:
         where.append("subzona = ?")
         params.append(subzona)
+    if public_id_prefix:
+        where.append("public_id LIKE ? || '%'")
+        params.append(public_id_prefix)
     if min_area is not None:
         where.append("area_terreno_catastral_m2 >= ?")
         params.append(min_area)

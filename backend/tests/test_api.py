@@ -115,6 +115,24 @@ class TestProperties:
         body = client.get("/api/v1/properties?limit=5000").json()
         assert body["pagination"]["limit"] <= 100
 
+    def test_busqueda_por_prefijo_public_id(self, client):
+        listing = client.get("/api/v1/properties?limit=1").json()
+        public_id = listing["items"][0]["public_id"]
+        prefix = public_id[:5]
+        body = client.get(
+            "/api/v1/properties", params={"public_id_prefix": prefix}
+        ).json()
+        assert body["pagination"]["total"] >= 1
+        assert all(
+            item["public_id"].startswith(prefix) for item in body["items"]
+        )
+
+    def test_busqueda_prefijo_invalida_422(self, client):
+        response = client.get(
+            "/api/v1/properties", params={"public_id_prefix": "abc%%"}
+        )
+        assert response.status_code == 422
+
 
 class TestStatistics:
     def test_overview_real(self, client):

@@ -32,7 +32,9 @@ def _connect(request: Request) -> sqlite3.Connection:
     try:
         return get_connection(request.app.state.settings.database_path)
     except FileNotFoundError as exc:
-        raise InvalidQueryError(details={"razon": str(exc)}) from exc
+        raise InvalidQueryError(
+            details={"razon": "base de datos no disponible en este servidor"}
+        ) from exc
 
 
 def _weighted(zones: list[dict]) -> tuple[float | None, list[str]]:
