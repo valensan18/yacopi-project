@@ -446,6 +446,26 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 - Oficial intacto: **503 MODEL_NOT_READY**. Pruebas: 88 pytest + 19 vitest;
   Playwright escritorio/móvil 7/7 sin errores de consola. Ver `docs/10`.
 
+### Fase 7C — Auditoría de integridad (correcciones)
+
+- **Particiones versionadas e inmutables** por firma de dataset
+  (`data/splits/zhg/<objetivo>_n<n>/`); las pruebas usan directorios
+  temporales y ya no sobrescriben particiones reales; archivos planos
+  heredados movidos a `_legacy_sobrescritos/`. Pérdida de las particiones
+  originales de Fase 5 documentada (sin reconstrucción artificial).
+- **Alcance real del artefacto:** ajustado sobre los 7.709 predios; cada
+  respuesta incluye `formo_parte_del_ajuste: true` y la advertencia
+  obligatoria de que la diferencia mostrada no es una evaluación
+  independiente.
+- **Opacidad verificada con evidencia** (7.709 claves `p_[0-9a-f]{16}`,
+  coincidencia exacta con `parcels.public_id`, servicio sin IDs privados) +
+  prueba automatizada.
+- **Consistencia del pipeline probada** (esquema de 19 características
+  idéntico al entrenamiento, sin fuga, referencia = valor de zona) + E2E
+  aislado con base y artefacto reales.
+- Suite final: **94 pytest + 19 vitest**; flag experimental false por
+  defecto; oficial 503 intacto.
+
 ---
 
 ## FASES 1–8 — Estado

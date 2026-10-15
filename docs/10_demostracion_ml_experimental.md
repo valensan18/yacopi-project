@@ -144,3 +144,69 @@ pertenencia a particiones históricas sin identificadores privados).
 Requiere: autorización expresa, etiqueta verificada (`label_contract.yaml`),
 evaluación independiente con datos nuevos (no reparticiones de los mismos
 datos) y revisión de criterios. Nada de esto ocurre en esta fase.
+
+---
+
+## 14. AUDITORÍA FASE 7C (correcciones de integridad)
+
+### 14.1 Reproducibilidad de particiones (Problema 1)
+
+- **Causa de la sobrescritura:** `make_zhg_splits` escribía SIEMPRE en un
+  directorio plano fijo (`data/splits/zhg/`) con los mismos 8 nombres, y
+  tanto los experimentos como las pruebas automatizadas lo regeneraban en
+  cada ejecución. La corrida ponderada de Fase 5 y los tests posteriores
+  reescribieron las particiones de la corrida dominante.
+- **Corrección:** particiones **versionadas e inmutables por firma de
+  dataset** (`data/splits/zhg/<objetivo>_n<tamaño>/`), con
+  `get_or_create_zhg_splits`: si existen, se cargan; si no, se generan una
+  vez. Las pruebas usan directorios temporales (`--splits-dir`), de modo
+  que nunca tocan particiones reales. Los archivos planos heredados se
+  movieron a `data/splits/zhg/_legacy_sobrescritos/` (local).
+- **¿Se pueden recuperar las particiones originales?** No con evidencia
+  verificable: su contenido se perdió y solo quedan sus hashes en el
+  manifiesto histórico. Se documenta la pérdida de trazabilidad; no se
+  reconstruyen hashes ni se presentan particiones nuevas como originales.
+- El artefacto registra en su manifiesto el directorio versionado usado y
+  los hashes de esas particiones.
+
+### 14.2 Alcance real de las predicciones (Problema 2)
+
+- El artefacto se ajustó sobre **los 7.709 predios** con zona conocida:
+  **toda consulta corresponde a un predio del conjunto de ajuste**.
+- La API lo declara explícitamente en cada respuesta:
+  `evaluation_context.formo_parte_del_ajuste = true` y la advertencia
+  obligatoria: *"Este predio forma parte de los datos utilizados para
+  ajustar el modelo experimental. La diferencia mostrada no constituye una
+  evaluación independiente de exactitud."*
+- El MAE histórico de Fase 5 no se atribuye a este artefacto.
+
+### 14.3 Opacidad de public_id (Problema 3, verificado en código)
+
+- El constructor ZHG interno sí usa el identificador predial crudo bajo el
+  nombre `public_id` (`dataset.py` línea ~103) — únicamente dentro del
+  pipeline offline.
+- `export_demo.py` traduce TODO a identificador opaco (`p_` + SHA-256[:16])
+  antes de escribir `features.json` y `split_membership.json`.
+- Verificado con evidencia: las 7.709 claves del artefacto cumplen
+  `p_[0-9a-f]{16}`, ninguna es un número predial de 30 dígitos, y coinciden
+  exactamente con `parcels.public_id` de la base. El servicio de inferencia
+  no contiene `numero_predial`/`CODPRED`. Prueba automatizada añadida
+  (`TestIntegridadDemoArtifact.test_features_json_opacas_...`).
+
+### 14.4 Consistencia del pipeline de inferencia (Problema 4, probado)
+
+- Pruebas reales: el `feature_schema.json` del artefacto coincide
+  exactamente con las 19 características del entrenamiento (orden, numéricas
+  y categóricas); ninguna característica está en la lista de bloqueadas ni
+  es `ZHG_VALOR_`/`zone_code`; la referencia de cada predio coincide con el
+  valor de su zona en la tabla `zhg_zones` (mismo concepto económico).
+- E2E aislado con la base y el artefacto REALES (flag habilitado solo en el
+  entorno de prueba): monozona 200 con valor finito positivo y advertencia
+  de pertenencia al ajuste; multizona 422; inexistente 404; oficial 503.
+
+### 14.5 Estado de la demostración
+
+- Desactivada por defecto (`EXPERIMENTAL_ZHG_ENABLED=false`, probado).
+- Predicción oficial: **503 MODEL_NOT_READY** (probado).
+- Resultados de la auditoría: **94 pytest + 19 vitest**; ruff/oxlint
+  limpios.
