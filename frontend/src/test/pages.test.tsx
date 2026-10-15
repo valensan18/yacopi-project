@@ -239,13 +239,14 @@ describe('Pantalla Modelos', () => {
 })
 
 describe('Pantalla Predicción', () => {
-  it('muestra bloqueo oficial y experimental desactivada', async () => {
+  it('muestra bloqueo oficial y oculta el bloque proxy desactivado', async () => {
     mockFetch({ '/system/status': statusFixture })
     renderAt('/prediccion', <Prediction />)
     await waitFor(() => {
       expect(screen.getByText(/503 MODEL_NOT_READY/)).toBeInTheDocument()
     })
-    expect(screen.getByText(/Predicción experimental: desactivada/)).toBeInTheDocument()
+    expect(screen.queryByText(/Predicción experimental: desactivada/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Predicción experimental \(proxy\)/)).not.toBeInTheDocument()
     expect(screen.getByText('Comprobar estado oficial (real)')).toBeInTheDocument()
   })
 

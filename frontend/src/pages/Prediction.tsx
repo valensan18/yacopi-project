@@ -354,25 +354,12 @@ export default function Prediction() {
 
       <ZhgDemoSection />
 
+      {/* Experimento proxy histórico (avalúo total/ha): se muestra SOLO si su
+          flag local está activo. Desactivado por defecto, no se presenta al
+          usuario final para evitar confundirlo con la demostración ZHG. */}
+      {experimentalEnabled && (
       <section className={styles.expSection}>
-        {!experimentalEnabled ? (
-          <>
-            <h2 className={styles.sectionTitle}>Predicción experimental: desactivada</h2>
-            <p>
-              El experimento proxy está desactivado por defecto en la configuración del
-              backend (<span className="mono">EXPERIMENTAL_INFERENCE_ENABLED=false</span>).
-              Solo puede activarse en un entorno local de desarrollo, con el artefacto{' '}
-              <span className="mono">exp-proxy-001</span> presente y verificado.
-            </p>
-            <p className={styles.expNote}>
-              Aunque se activara, su resultado sería un <strong>proxy de avalúo
-              catastral total por hectárea</strong>, nunca un valor del suelo ni un
-              avalúo oficial.
-            </p>
-          </>
-        ) : (
-          <>
-            <h2 className={styles.sectionTitle}>Predicción experimental (proxy)</h2>
+        <h2 className={styles.sectionTitle}>Predicción experimental (proxy)</h2>
             <p>
               La inferencia experimental está habilitada en este entorno. El formulario
               usa exclusivamente las variables admitidas por el backend y el resultado se
@@ -484,9 +471,8 @@ export default function Prediction() {
                 </Disclaimer>
               </div>
             )}
-          </>
-        )}
       </section>
+      )}
 
       <p className={`mono ${styles.conceptTag}`}>
         Avalúo oficial · no emitido por este software
