@@ -9,6 +9,12 @@ export interface ExperimentalModelInfo {
   es_etiqueta_oficial?: boolean
 }
 
+export interface ExperimentalZhgInfo {
+  habilitado: boolean
+  disponible: boolean
+  model_id?: string
+}
+
 export interface SystemStatus {
   data_status: string
   dataset_version: string | null
@@ -16,6 +22,7 @@ export interface SystemStatus {
   model_ready: boolean
   target_unit: string
   experimental_model: ExperimentalModelInfo
+  experimental_zhg?: ExperimentalZhgInfo
   reason: string
   public_notice: string
 }
@@ -147,4 +154,23 @@ export interface ZhgReferenceResponse {
   source_description: string
   reference_date: null
   limitations: string[]
+}
+
+export interface ZhgDemoResponse {
+  public_id: string
+  model_id: string
+  model_status: string
+  unit: string
+  target_description: string
+  reference_zhg_cop_ha: number
+  predicted_zhg_cop_ha: number
+  absolute_difference_cop_ha: number
+  relative_difference_pct: number | null
+  zone_code: string
+  domain_status: string
+  source_description: string
+  reference_date: null
+  limitations: string[]
+  evaluation_context: Record<string, unknown>
+  disclaimer: string
 }

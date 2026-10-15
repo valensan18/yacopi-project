@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { apiGet, apiPost, ApiError } from '../api/client'
-import type { SystemStatus } from '../api/types'
+import type { SystemStatus, ZhgDemoResponse } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
 import ZhgReferenceCard from '../components/ZhgReferenceCard'
@@ -124,6 +124,137 @@ function ZhgLookupSection() {
   )
 }
 
+function ZhgDemoSection() {
+  const [input, setInput] = useState('')
+
+  const status = useQuery<SystemStatus>({
+    queryKey: ['system-status'],
+    queryFn: () => apiGet<SystemStatus>('/system/status'),
+    staleTime: 60_000,
+  })
+
+  const demo = useMutation({
+    mutationFn: (publicId: string) =>
+      apiPost<ZhgDemoResponse>('/predictions/experimental-zhg', { public_id: publicId }),
+  })
+
+  const enabled = status.data?.experimental_zhg?.habilitado === true
+  const ready = status.data?.experimental_zhg?.disponible === true
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault()
+    const id = input.trim()
+    if (!id) return
+    demo.reset()
+    demo.mutate(id)
+  }
+
+  return (
+    <section className={styles.expSection} aria-label="Demostración experimental de ML">
+      <p className={`mono ${styles.demoKicker}`}>Predicción ML · demostración experimental</p>
+      <h2 className={styles.sectionTitle}>Demostración experimental (zonas conocidas)</h2>
+
+      {!enabled ? (
+        <>
+          <p>
+            La demostración experimental está{' '}
+            <strong>desactivada en este entorno</strong>{' '}
+            (<span className="mono">EXPERIMENTAL_ZHG_ENABLED=false</span>). Solo se
+            habilita localmente, con el artefacto{' '}
+            <span className="mono">exp-zhg-001-demo</span> presente y verificado.
+          </p>
+          <p className={styles.expNote}>
+            Aunque se habilite, su estimación sería una{' '}
+            <strong>demostración experimental</strong> para predios de zonas conocidas,
+            siempre junto a la referencia ZHG consultable; no constituye un avalúo
+            individual certificado.
+          </p>
+        </>
+      ) : !ready ? (
+        <p className={styles.expNote}>
+          El artefacto de la demostración no está disponible en este servidor.
+        </p>
+      ) : (
+        <>
+          <p>
+            Demostración con el modelo experimental (Random Forest) para{' '}
+            <strong>predios de una única zona conocida</strong>. La estimación se muestra
+            siempre junto a la referencia ZHG y su diferencia.
+          </p>
+          <form className={styles.searchForm} onSubmit={submit}>
+            <label className={styles.searchLabel} htmlFor="zhg-demo-id">
+              Identificador público del predio
+            </label>
+            <div className={styles.searchRow}>
+              <input
+                id="zhg-demo-id"
+                className={styles.searchInput}
+                type="text"
+                placeholder="p_ab12cd34ef567890"
+                value={input}
+                maxLength={32}
+                onChange={(e) => setInput(e.target.value)}
+              />
+              <button type="submit" className={styles.searchButton} disabled={demo.isPending}>
+                {demo.isPending ? 'Calculando…' : 'Ejecutar demostración experimental'}
+              </button>
+            </div>
+          </form>
+
+          {demo.isError && (
+            <div className={styles.resultError} role="alert">
+              {demo.error instanceof ApiError
+                ? `${demo.error.status} ${demo.error.code}: ${demo.error.message}`
+                : 'No se pudo ejecutar la demostración.'}
+            </div>
+          )}
+
+          {demo.isSuccess && demo.data && (
+            <div className={styles.demoResult} role="status">
+              <p className={`mono ${styles.resultCode}`}>
+                {demo.data.model_status} · {demo.data.model_id}
+              </p>
+              <div className={styles.demoGrid}>
+                <div>
+                  <p className={styles.demoLabel}>Referencia ZHG conocida</p>
+                  <p className={styles.demoValue}>
+                    {formatCopPerHa(demo.data.reference_zhg_cop_ha)}
+                  </p>
+                </div>
+                <div>
+                  <p className={styles.demoLabel}>Estimación experimental</p>
+                  <p className={`${styles.demoValue} ${styles.demoEstimate}`}>
+                    {formatCopPerHa(demo.data.predicted_zhg_cop_ha)}
+                  </p>
+                </div>
+                <div>
+                  <p className={styles.demoLabel}>Diferencia</p>
+                  <p className={`${styles.demoValue} mono`}>
+                    {formatCop(demo.data.absolute_difference_cop_ha)}
+                    {demo.data.relative_difference_pct != null &&
+                      ` (${demo.data.relative_difference_pct} %)`}
+                  </p>
+                </div>
+              </div>
+              <p className={styles.demoMeta}>
+                Zona {demo.data.zone_code} · dominio:{' '}
+                <span className="mono">{demo.data.domain_status}</span> · unidad{' '}
+                <span className="mono">{demo.data.unit}</span>
+              </p>
+              <ul className={styles.warnings}>
+                {demo.data.limitations.map((limitation) => (
+                  <li key={limitation}>{limitation}</li>
+                ))}
+              </ul>
+              <p className={styles.demoDisclaimer}>{demo.data.disclaimer}</p>
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  )
+}
+
 export default function Prediction() {
   const [officialResult, setOfficialResult] = useState<string | null>(null)
   const [form, setForm] = useState<Record<string, string>>({
@@ -220,6 +351,8 @@ export default function Prediction() {
           Respuesta real del backend: <span className="mono">{officialResult}</span>
         </p>
       )}
+
+      <ZhgDemoSection />
 
       <section className={styles.expSection}>
         {!experimentalEnabled ? (

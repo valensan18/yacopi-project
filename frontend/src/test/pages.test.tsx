@@ -17,8 +17,31 @@ const statusFixture = {
   model_ready: false,
   target_unit: 'COP/ha',
   experimental_model: { disponible: false, habilitado: false },
+  experimental_zhg: { habilitado: false, disponible: false },
   reason: 'etiqueta pendiente',
   public_notice: 'Información académica',
+}
+
+const demoFixture = {
+  public_id: 'p_abc123',
+  model_id: 'exp-zhg-001-demo',
+  model_status: 'experimental',
+  unit: 'COP/ha',
+  target_description: 'valor unitario de referencia ZHG del suelo rural',
+  reference_zhg_cop_ha: 456041.7,
+  predicted_zhg_cop_ha: 452000.0,
+  absolute_difference_cop_ha: -4041.7,
+  relative_difference_pct: -0.89,
+  zone_code: '07',
+  domain_status: 'in_domain',
+  source_description: 'valor_hectarea_agropecuario = ZHG_VALOR_ por zona',
+  reference_date: null,
+  limitations: [
+    'Demostración experimental de aprendizaje automático. Su resultado no constituye un avalúo individual certificado ni reemplaza la referencia ZHG.',
+  ],
+  evaluation_context: { split_membership: { predio: 'train' } },
+  disclaimer:
+    'Demostración experimental de aprendizaje automático. Su resultado no constituye un avalúo individual certificado ni reemplaza la referencia ZHG.',
 }
 
 const overviewFixture = {
@@ -245,6 +268,46 @@ describe('Pantalla Predicción', () => {
     })
     expect(screen.getByText('dato · no predicción')).toBeInTheDocument()
     expect(screen.getByText(/Avalúo oficial · no emitido/)).toBeInTheDocument()
+  })
+
+  it('muestra la demostración ML desactivada cuando el flag está apagado', async () => {
+    mockFetch({ '/system/status': statusFixture })
+    renderAt('/prediccion', <Prediction />)
+    await waitFor(() => {
+      expect(screen.getByText(/Demostración experimental \(zonas conocidas\)/)).toBeInTheDocument()
+    })
+    expect(screen.getByText(/desactivada en este entorno/)).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Ejecutar demostración experimental/ }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('ejecuta la demostración ML cuando el flag está activo', async () => {
+    mockFetch({
+      '/system/status': {
+        ...statusFixture,
+        experimental_zhg: { habilitado: true, disponible: true },
+      },
+      '/predictions/experimental-zhg': demoFixture,
+    })
+    renderAt('/prediccion', <Prediction />)
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Demostración experimental \(zonas conocidas\)/),
+      ).toBeInTheDocument()
+    })
+    // dos inputs "Identificador público del predio" (referencia ZHG y demo):
+    const inputs = screen.getAllByLabelText('Identificador público del predio')
+    await userEvent.type(inputs[inputs.length - 1], 'p_abc123')
+    await userEvent.click(
+      screen.getByRole('button', { name: /Ejecutar demostración experimental/ }),
+    )
+    await waitFor(() => {
+      expect(screen.getByText('Referencia ZHG conocida')).toBeInTheDocument()
+    })
+    expect(screen.getByText('Estimación experimental')).toBeInTheDocument()
+    expect(screen.getByText('Diferencia')).toBeInTheDocument()
+    expect(screen.getAllByText(/no constituye un avalúo individual certificado/).length).toBeGreaterThan(0)
   })
 })
 
