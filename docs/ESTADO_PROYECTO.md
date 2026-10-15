@@ -485,6 +485,23 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## FASE 8 — Auditoría integral (COMPLETADA)
+
+- Auditoría ejecutada contra servidores reales: 10 rutas en escritorio y
+  móvil sin errores de aplicación; interacciones verificadas (filtros,
+  fichas, mapa CARTO, gráficas, glosario, ayudas, 503 oficial, consulta
+  ZHG); integridad API↔DB 12/12.
+- Sin defectos críticos ni importantes. 404/503 intencionales documentados
+  como comportamiento esperado.
+- **Dictamen: LISTO PARA ENTREGA CON LIMITACIONES EXPLÍCITAS** (ver
+  `docs/12_auditoria_integral.md`): ¿Funciona? SÍ · ¿Se entiende? SÍ según
+  revisión heurística · ¿Cumple el anteproyecto? SÍ como prototipo con
+  limitaciones científicas declaradas.
+- Backend local restaurado a estado por defecto (flags apagados); oficial
+  503; sin push.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
