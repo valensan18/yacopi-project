@@ -1,12 +1,17 @@
 """Pruebas del experimento ZHG (Fase 5): equivalencia, fuga, integridad."""
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
 import pytest
 from yacopi_ml.metrics import compute_metrics
-from yacopi_ml.schema import FEATURE_COLUMNS
+from yacopi_ml.schema import (
+    CATEGORICAL_FEATURES,
+    FEATURE_COLUMNS,
+    NUMERIC_FEATURES,
+)
 from yacopi_ml.zhg.dataset import (
     TARGET_DOMINANTE,
     TARGET_PONDERADO,
@@ -90,7 +95,10 @@ class TestDatasetZhg:
             assert not set(s1[scenario][0]) & set(s1[scenario][1])
 
     def test_smoke_run_payload(self, tmp_path):
-        args = SimpleNamespace(smoke=True, output=str(tmp_path / "exp"), target="dominante")
+        args = SimpleNamespace(
+            smoke=True, output=str(tmp_path / "exp"), target="dominante",
+            splits_dir=str(tmp_path / "splits"),
+        )
         payload = run(args)
         assert payload["n_zonas"] == 11
         assert payload["valores_objetivo_unicos"] == 11
@@ -124,3 +132,69 @@ class TestMetricasSinteticas:
         pred = np.array([600000.0, 500000.0, 550000.0])
         m = compute_metrics(y, pred)
         assert np.isnan(m["r2"])
+
+
+class TestIntegridadDemoArtifact:
+    """Consistencia del pipeline de inferencia con el artefacto real (P4/P3)."""
+
+    def _artifact_dir(self):
+        base = ROOT / "ml" / "artifacts" / "exp-zhg-001-demo"
+        if not (base / "features.json").exists():
+            pytest.skip("artefacto exp-zhg-001-demo no presente")
+        return base
+
+    def test_features_json_opacas_y_bien_correspondidas(self):
+        import re
+        import sqlite3
+
+        artifact = self._artifact_dir()
+        features = json.loads(
+            (artifact / "features.json").read_text(encoding="utf-8")
+        )
+        assert len(features) == 7709
+        for key in features:
+            assert re.fullmatch(r"p_[0-9a-f]{16}", key), key
+            assert not re.fullmatch(r"\d{30}", key)
+        conn = sqlite3.connect(ROOT / "data" / "parcels.db")
+        db_ids = {r[0] for r in conn.execute("SELECT public_id FROM parcels")}
+        conn.close()
+        assert set(features) == db_ids
+
+    def test_esquema_demo_identico_al_entrenamiento(self):
+        artifact = self._artifact_dir()
+        schema = json.loads(
+            (artifact / "feature_schema.json").read_text(encoding="utf-8")
+        )
+        assert schema["orden"] == FEATURE_COLUMNS
+        assert set(schema["numericas"]) == set(NUMERIC_FEATURES)
+        assert set(schema["categoricas"]) == set(CATEGORICAL_FEATURES)
+
+    def test_sin_fuga_en_features_del_artefacto(self):
+        from yacopi_ml.zhg.train import load_zhg_blocked
+
+        artifact = self._artifact_dir()
+        blocked = load_zhg_blocked()
+        features = json.loads(
+            (artifact / "features.json").read_text(encoding="utf-8")
+        )
+        first = next(iter(features.values()))
+        assert not (set(first["features"]) & blocked)
+        assert "ZHG_VALOR_" not in first["features"]
+        assert "zone_code" not in first["features"]
+
+    def test_referencia_consistente_con_tabla_de_zonas(self):
+        import sqlite3
+
+        artifact = self._artifact_dir()
+        conn = sqlite3.connect(ROOT / "data" / "parcels.db")
+        zones = {
+            r[0]: r[1]
+            for r in conn.execute("SELECT zone_code, value_cop_ha FROM zhg_zones")
+        }
+        conn.close()
+        features = json.loads(
+            (artifact / "features.json").read_text(encoding="utf-8")
+        )
+        for entry in features.values():
+            expected = zones[entry["zone_code"]]
+            assert abs(entry["reference_zhg_cop_ha"] - expected) < 1e-6

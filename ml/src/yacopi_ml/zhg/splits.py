@@ -20,10 +20,23 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.model_selection import GroupShuffleSplit, train_test_split
 
-SPLITS_DIR = Path(__file__).resolve().parents[4] / "data" / "splits" / "zhg"
+SPLITS_BASE = Path(__file__).resolve().parents[4] / "data" / "splits" / "zhg"
 SEED = 42
 TEST_SIZE = 0.2
 N_CLUSTERS = 25
+
+SCENARIO_FILES = {
+    "filas": ("train_filas", "test_filas"),
+    "predio": ("train_predio", "test_predio"),
+    "espacial": ("train_espacial", "test_espacial"),
+    "zona": ("train_zona", "test_zona"),
+}
+
+
+def splits_dir_for(target_name: str, n_rows: int) -> Path:
+    """Directorio versionado por firma del dataset (inmutable por diseño):
+    cada combinación objetivo+tamaño conserva sus propias particiones."""
+    return SPLITS_BASE / f"{target_name}_n{n_rows}"
 
 
 def _hash_ids(ids: list[str]) -> str:
@@ -38,7 +51,7 @@ def _write(splits_dir: Path, name: str, ids: list[str]) -> dict:
 
 
 def make_zhg_splits(
-    df: pd.DataFrame, splits_dir: Path = SPLITS_DIR
+    df: pd.DataFrame, splits_dir: Path
 ) -> dict:
     splits_dir.mkdir(parents=True, exist_ok=True)
     ids = df["public_id"].astype(str).tolist()
@@ -106,3 +119,40 @@ def make_zhg_splits(
         "zona": (list(train_z), list(test_z)),
         "manifest": manifest,
     }
+
+
+def get_or_create_zhg_splits(
+    df: pd.DataFrame, target_name: str, splits_dir: Path | None = None
+) -> dict:
+    """Carga particiones versionadas si existen; si no, las genera UNA vez.
+
+    Con esto ningún experimento ni prueba sobrescribe particiones ajenas:
+    cada firma (objetivo + tamaño) tiene su directorio inmutable."""
+    directory = splits_dir or splits_dir_for(target_name, len(df))
+    required = [f"{name}.json" for pair in SCENARIO_FILES.values() for name in pair]
+    if directory.exists() and all((directory / name).exists() for name in required):
+        return load_zhg_splits(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+    for stale in directory.glob("*.json"):
+        stale.unlink()
+    return make_zhg_splits(df, splits_dir=directory)
+
+
+def load_zhg_splits(directory: Path) -> dict:
+    """Lee las particiones congeladas de un directorio versionado."""
+    out: dict = {}
+    manifest: dict = {"directorio": str(directory)}
+    for scenario, (train_key, test_key) in SCENARIO_FILES.items():
+        train = json.loads(
+            (directory / f"{train_key}.json").read_text(encoding="utf-8")
+        )
+        test = json.loads(
+            (directory / f"{test_key}.json").read_text(encoding="utf-8")
+        )
+        out[scenario] = (train["ids"], test["ids"])
+        manifest[f"{train_key}_n"] = train["n"]
+        manifest[f"{train_key}_sha256"] = train["sha256"]
+        manifest[f"{test_key}_n"] = test["n"]
+        manifest[f"{test_key}_sha256"] = test["sha256"]
+    out["manifest"] = manifest
+    return out

@@ -28,7 +28,7 @@ from ..metrics import compute_metrics
 from ..models import get_models, smoke_params
 from ..schema import CATEGORICAL_FEATURES, FEATURE_COLUMNS, NUMERIC_FEATURES
 from .dataset import TARGET_DOMINANTE, TARGET_PONDERADO, build_zhg_dataset
-from .splits import make_zhg_splits
+from .splits import get_or_create_zhg_splits
 
 ML_ROOT = Path(__file__).resolve().parents[3]
 CONFIG = ML_ROOT / "config"
@@ -93,7 +93,9 @@ def run(args) -> dict:
         df = df[df[TARGET_PONDERADO].notna()].reset_index(drop=True)
     df = df[df[target_col] > 0].reset_index(drop=True)
 
-    splits = make_zhg_splits(df)
+    splits = get_or_create_zhg_splits(
+        df, args.target, splits_dir=Path(args.splits_dir) if args.splits_dir else None
+    )
     X_all = df[FEATURE_COLUMNS].copy()
     for col in NUMERIC_FEATURES:
         X_all[col] = pd.to_numeric(X_all[col], errors="coerce")
@@ -264,6 +266,11 @@ def main() -> int:
         choices=["dominante", "ponderado"],
         help="dominante = valor de la zona con mayor participacion; "
              "ponderado = promedio ponderado por area (solo cobertura de hasta 5 por ciento)",
+    )
+    parser.add_argument(
+        "--splits-dir", default=None,
+        help="directorio versionado de particiones (por defecto se deriva "
+             "de la firma objetivo+tamano)",
     )
     args = parser.parse_args()
     run(args)

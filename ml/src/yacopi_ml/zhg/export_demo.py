@@ -31,6 +31,7 @@ from ..metrics import compute_metrics
 from ..models import get_models
 from ..schema import CATEGORICAL_FEATURES, FEATURE_COLUMNS, NUMERIC_FEATURES
 from .dataset import TARGET_DOMINANTE, build_zhg_dataset
+from .splits import get_or_create_zhg_splits
 
 SEED = 42
 N_SPLITS = 5
@@ -39,21 +40,10 @@ HISTORICAL_MAE_PREDIO = 73765.0
 TOLERANCIA = 1.0  # COP/ha (mismas particiones y semilla)
 
 ARTIFACTS = Path(__file__).resolve().parents[3] / "artifacts"
-SPLITS_DIR = Path(__file__).resolve().parents[4] / "data" / "splits" / "zhg"
 
 
 def public_id_for(source_id: str) -> str:
     return "p_" + hashlib.sha256(source_id.encode("utf-8")).hexdigest()[:16]
-
-
-def load_frozen_splits() -> dict:
-    out = {}
-    for name in ("train_predio", "test_predio", "train_filas", "test_filas",
-                 "train_espacial", "test_espacial", "train_zona", "test_zona"):
-        out[name] = json.loads(
-            (SPLITS_DIR / f"{name}.json").read_text(encoding="utf-8")
-        )["ids"]
-    return out
 
 
 def main() -> int:
@@ -68,9 +58,10 @@ def main() -> int:
         X[col] = X[col].astype("object")
     y = pd.to_numeric(df[TARGET_DOMINANTE], errors="coerce")
 
-    splits = load_frozen_splits()
-    train_ids = set(splits["train_predio"])
-    test_ids = set(splits["test_predio"])
+    splits = get_or_create_zhg_splits(df, "dominante")
+    splits_dir = Path(splits["manifest"]["directorio"])
+    train_ids = set(splits["predio"][0])
+    test_ids = set(splits["predio"][1])
 
     tr_mask = df["public_id"].isin(train_ids)
     te_mask = df["public_id"].isin(test_ids)
@@ -141,16 +132,17 @@ def main() -> int:
     features_lookup: dict[str, dict] = {}
     split_membership: dict[str, dict] = {}
     scenario_files = {
-        "predio": ("train_predio", "test_predio"),
-        "filas": ("train_filas", "test_filas"),
-        "espacial": ("train_espacial", "test_espacial"),
-        "zona": ("train_zona", "test_zona"),
+        "predio": ("predio",),
+        "filas": ("filas",),
+        "espacial": ("espacial",),
+        "zona": ("zona",),
     }
     memberships: dict[str, dict] = {}
-    for scenario, (train_key, test_key) in scenario_files.items():
-        for sid in splits[train_key]:
+    for scenario in scenario_files:
+        train_ids_s, test_ids_s = splits[scenario]
+        for sid in train_ids_s:
             memberships.setdefault(sid, {})[scenario] = "train"
-        for sid in splits[test_key]:
+        for sid in test_ids_s:
             memberships.setdefault(sid, {})[scenario] = "test"
 
     for _, row in df.iterrows():
@@ -216,7 +208,8 @@ def main() -> int:
         ),
         "n_fit_rows": int(len(df)),
         "fit_partition": "todos los predios con zona conocida (ajuste final determinístico)",
-        "split_files": str(SPLITS_DIR),
+        "split_files": str(splits_dir),
+        "split_manifest": splits["manifest"],
         "built_at": started.isoformat(),
         "package_versions": {
             "python": sys.version.split()[0],
@@ -233,12 +226,14 @@ def main() -> int:
             "fue aceptado como candidato a producción."
         ),
         "integrity_note": (
-            "Los archivos de particiones congeladas fueron regenerados por "
-            "corridas posteriores a Fase 5 (experimento ponderado y pruebas); "
-            "sus hashes difieren de los del manifiesto histórico. Los "
-            "hiperparámetros se recuperaron con la misma búsqueda "
-            "determinística sobre las particiones actuales. MAE verificada con "
-            "particiones actuales: " + f"{mae:.2f}" + " COP/ha."
+            "Las particiones de Fase 5 se perdieron por sobrescritura (las "
+            "corridas posteriores y las pruebas reescribían los archivos "
+            "planos de data/splits/zhg). Desde la Fase 7C las particiones "
+            "se versionan por firma de dataset en directorios inmutables. "
+            "Las particiones usadas aquí son las de la firma dominante_n7709 "
+            "generadas en 7C, NO las originales de Fase 5; la métrica "
+            "histórica no se reproduce con ellas (documentado). MAE verificada "
+            "con estas particiones: " + f"{mae:.2f}" + " COP/ha."
         ),
     }
     (exp_dir / "manifest.json").write_text(
