@@ -468,6 +468,23 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## FASE 7E — Accesibilidad y comprensión (COMPLETADA)
+
+- Glosario central con 56 términos (3 categorías) con búsqueda, en la
+  navegación; HelpTip accesible (teclado/Escape/aria-expanded) en ficha,
+  catálogo, mapa, análisis, modelos y predicción.
+- «¿Qué significa esto para este predio?» con datos reales: ficha general,
+  referencia ZHG (mono/multizona/cobertura), alertas y resultado ML.
+- Correcciones en Predicción: diferencia en COP/ha, `in_domain` traducido,
+  advertencias priorizadas (ajuste → no evaluación independiente → no
+  avalúo) + resto en desplegable.
+- Modelos: sección que distingue Fase 5 histórica / artefacto actual /
+  referencia ZHG / oficial 503; ayuda de MAE/RMSE/R².
+- Pruebas: 28 vitest + 94 pytest; Playwright escritorio/móvil 4/4 sin
+  errores de consola. Detalle en `docs/11_accesibilidad_y_comprension.md`.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
