@@ -518,6 +518,20 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## FASE 9 — Coherencia global de textos (COMPLETADA)
+
+- Fuente centralizada `frontend/src/lib/appContent.ts` (descripciones corta
+  y extendida, referencia ZHG, modelo experimental, históricos, estado
+  oficial, no-avalúos) usada por footer, Acerca y banner.
+- Corregidas 10 incidencias de textos desactualizados (footer, Inicio,
+  Análisis con enlaces, Modelos lede y título histórico, Acerca,
+  Metodología, banner). El proxy histórico se conserva contextualizado.
+- Prevención: 5 pruebas de regresión (`content.test.tsx`) que fallan si
+  reaparecen afirmaciones obsoletas. Verificación Playwright 14/14 en
+  escritorio y móvil sin errores de consola. Detalle en `docs/14`.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
