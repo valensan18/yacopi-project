@@ -384,6 +384,33 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## FASE 6B — Implementación de referencias ZHG (COMPLETADA 2026-10-14)
+
+### Decisiones tomadas
+
+- Funcionalidad A aprobada e implementada: consulta de referencias ZHG
+  (dato, no predicción). ML experimental NO habilitado.
+- Precisión sobre la propuesta 6A: la ponderación consolidada se expone
+  solo con cobertura consistente (≤1 %); entre 1–5 % se muestra como
+  cálculo PROVISIONAL inequívoco; >5 % sin ponderado (documentado en
+  `docs/08_implementacion_referencias_zhg.md`).
+- SQLite ampliado con `zhg_zones` (11) y `parcel_zhg_references` (9.434),
+  idempotente vía `scripts/build_db.py`.
+
+### Resultados
+
+- Endpoints: `GET /references/zhg/zones` y
+  `GET /properties/{public_id}/zhg-reference` (404 para inexistente;
+  `zones: []` sin datos; `reference_date: null`).
+- Frontend: `ZhgReferenceCard` en ficha y sección de consulta en
+  `/prediccion` con tres conceptos diferenciados (referencia ZHG /
+  predicción ML no habilitada / avalúo no emitido).
+- Verificación real: 11 zonas correctas; monozona y multizona según reglas;
+  `POST /predictions` sigue **503 MODEL_NOT_READY**.
+- Pruebas: 77 pytest + 17 vitest; ruff/oxlint limpios; build OK.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
