@@ -10,6 +10,7 @@ class SystemStatus(BaseModel):
     model_ready: bool
     target_unit: str
     experimental_model: dict
+    experimental_zhg: dict = {}
     reason: str
     public_notice: str
 

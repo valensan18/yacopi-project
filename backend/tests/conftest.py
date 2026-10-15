@@ -89,3 +89,59 @@ def mini_db(tmp_path):
     path = tmp_path / "mini.db"
     build_minimal_db(path)
     return path
+
+
+def build_mini_zhg_demo(model_dir: Path, entries: dict[str, dict]) -> Path:
+    """Artefacto de demostración ZHG mínimo para pruebas (Fase 7B)."""
+    import json
+
+    import joblib
+    import pandas as pd
+    from sklearn.dummy import DummyRegressor
+
+    art = model_dir / "exp-zhg-001-demo"
+    art.mkdir(parents=True, exist_ok=True)
+
+    schema = {
+        "orden": ["area_terreno_catastral_m2", "tr_latitud", "destino_economico"],
+        "numericas": ["area_terreno_catastral_m2", "tr_latitud"],
+        "categoricas": ["destino_economico"],
+        "unidades": {"area_terreno_catastral_m2": "m2", "tr_latitud": "grados"},
+    }
+    (art / "feature_schema.json").write_text(
+        json.dumps(schema), encoding="utf-8"
+    )
+    stats = {
+        "numeric": {
+            "area_terreno_catastral_m2": {"min": 1000.0, "max": 900_000.0},
+            "tr_latitud": {"min": 5.3, "max": 5.9},
+        },
+        "categorical": {"destino_economico": ["Agropecuario", "SIN_DATO"]},
+    }
+    (art / "training_stats.json").write_text(
+        json.dumps(stats), encoding="utf-8"
+    )
+    (art / "features.json").write_text(
+        json.dumps(entries, ensure_ascii=False), encoding="utf-8"
+    )
+    (art / "split_membership.json").write_text(
+        json.dumps({pid: {"predio": "train"} for pid in entries}),
+        encoding="utf-8",
+    )
+    (art / "manifest.json").write_text(
+        json.dumps({
+            "model_id": "exp-zhg-001-demo",
+            "status": "experimental",
+            "target_description": "valor unitario de referencia ZHG del suelo rural (COP/ha)",
+        }),
+        encoding="utf-8",
+    )
+    model = DummyRegressor(strategy="mean")
+    frame = pd.DataFrame([{
+        "area_terreno_catastral_m2": 50000.0,
+        "tr_latitud": 5.5,
+        "destino_economico": "Agropecuario",
+    }])
+    model.fit(frame, [500_000.0])
+    joblib.dump(model, art / "model.joblib")
+    return art

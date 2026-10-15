@@ -49,6 +49,47 @@ class ExperimentalModelUnavailableError(ApiError):
     )
 
 
+class ExperimentalZhgDisabledError(ApiError):
+    code = "EXPERIMENTAL_ZHG_DISABLED"
+    status = 503
+    message = (
+        "La demostración experimental ZHG está desactivada en este entorno"
+    )
+
+
+class ExperimentalZhgUnavailableError(ApiError):
+    code = "EXPERIMENTAL_ZHG_UNAVAILABLE"
+    status = 503
+    message = (
+        "El artefacto de la demostración ZHG no está disponible o no superó "
+        "la verificación de integridad"
+    )
+
+
+class UnsupportedParcelError(ApiError):
+    code = "UNSUPPORTED_PARCEL"
+    status = 422
+    message = (
+        "El predio no tiene características compatibles con la demostración "
+        "experimental"
+    )
+
+
+class UnsupportedMultizoneError(ApiError):
+    code = "UNSUPPORTED_MULTIZONE"
+    status = 422
+    message = (
+        "La demostración experimental de esta versión solo admite predios de "
+        "una única zona geoeconómica"
+    )
+
+
+class OutOfDomainError(ApiError):
+    code = "OUT_OF_DOMAIN"
+    status = 422
+    message = "El predio queda fuera del dominio observado en el entrenamiento"
+
+
 class InvalidQueryError(ApiError):
     code = "INVALID_INPUT"
     status = 422

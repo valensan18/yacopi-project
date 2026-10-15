@@ -28,6 +28,7 @@ from .routers import (
     statistics,
     system,
 )
+from .services.demo import ExperimentalZhgService
 from .services.prediction import (
     ExperimentalPredictionService,
     OfficialPredictionService,
@@ -57,6 +58,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     logging.basicConfig(level=getattr(logging, settings.log_level.upper(), logging.INFO))
 
     experimental_predictor = ExperimentalPredictionService(settings.model_dir)
+    experimental_zhg = ExperimentalZhgService(settings.model_dir)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -64,6 +66,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.dataset_version = resolve_dataset_version(settings)
         app.state.official_predictor = OfficialPredictionService()
         app.state.experimental_predictor = experimental_predictor
+        app.state.experimental_zhg = experimental_zhg
 
         if settings.experimental_inference_enabled:
             try:
@@ -74,6 +77,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 logger.warning("Artefacto experimental NO cargado: %s", exc)
         else:
             logger.info("Inferencia experimental desactivada por configuración")
+
+        if settings.experimental_zhg_enabled:
+            try:
+                experimental_zhg.load()
+                logger.info("Demostración ZHG cargada: %s",
+                            experimental_zhg.artifact_dir)
+            except Exception as exc:  # noqa: BLE001 — se registra y sigue sin demo
+                logger.warning("Demostración ZHG NO cargada: %s", exc)
+        else:
+            logger.info("Demostración ZHG desactivada por configuración")
 
         app.state.dataset_version = resolve_dataset_version(settings)
         yield

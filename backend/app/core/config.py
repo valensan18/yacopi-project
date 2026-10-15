@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     database_path: Path = REPO_ROOT / "data" / "parcels.db"
     model_dir: Path = REPO_ROOT / "ml" / "artifacts"
     experimental_inference_enabled: bool = False
+    experimental_zhg_enabled: bool = False
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     max_page_limit: int = 100
     max_map_points: int = 8000
