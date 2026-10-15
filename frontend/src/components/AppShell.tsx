@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/exploracion', label: 'Análisis' },
   { to: '/modelos', label: 'Modelos' },
   { to: '/metodologia', label: 'Metodología' },
+  { to: '/glosario', label: 'Glosario' },
   { to: '/acerca-de', label: 'Acerca' },
 ]
 

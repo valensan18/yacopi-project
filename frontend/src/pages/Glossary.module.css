@@ -1,0 +1,119 @@
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  margin-bottom: var(--s3);
+}
+
+.searchLabel {
+  font-size: 0.85rem;
+  color: var(--stone);
+}
+
+.search {
+  background: var(--ink-2);
+  color: var(--chalk);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-sm);
+  padding: 0.7rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  max-width: 30rem;
+}
+
+.search:focus {
+  outline: 2px solid var(--copper);
+  outline-offset: 1px;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+}
+
+.categoryButton {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--stone);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.categoryActive {
+  color: var(--ink);
+  background: var(--copper);
+  border-color: var(--copper);
+  font-weight: 600;
+}
+
+.count {
+  color: var(--stone);
+  margin-bottom: var(--s2);
+}
+
+.list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  padding-bottom: var(--s7);
+}
+
+.entry {
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  padding: var(--s2) var(--s3);
+}
+
+.term {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--chalk);
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex-wrap: wrap;
+  margin-bottom: var(--s1);
+}
+
+.categoryTag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--copper);
+  border: 1px solid var(--color-border-accent);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.definition {
+  margin: 0;
+  color: var(--chalk);
+}
+
+.interpretation,
+.limitation {
+  margin: var(--s1) 0 0;
+  font-size: 0.9rem;
+  color: var(--chalk);
+  opacity: 0.95;
+}
+
+.interpretation strong {
+  color: var(--moss);
+}
+
+.limitation strong {
+  color: var(--amber-data);
+}
+
+.empty {
+  color: var(--stone);
+  padding-bottom: var(--s6);
+}

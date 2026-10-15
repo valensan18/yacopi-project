@@ -139,3 +139,10 @@
   font-size: var(--fs-mono);
   color: var(--chalk);
 }
+
+.panelNote {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--chalk);
+  opacity: 0.95;
+}

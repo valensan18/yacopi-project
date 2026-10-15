@@ -12,6 +12,7 @@ const Models = lazy(() => import('./pages/Models'))
 const Prediction = lazy(() => import('./pages/Prediction'))
 const Methodology = lazy(() => import('./pages/Methodology'))
 const About = lazy(() => import('./pages/About'))
+const Glossary = lazy(() => import('./pages/Glossary'))
 
 function Lazy({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<p className="mono">Cargando módulo…</p>}>{children}</Suspense>
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="prediccion" element={<Lazy><Prediction /></Lazy>} />
         <Route path="metodologia" element={<Lazy><Methodology /></Lazy>} />
         <Route path="acerca-de" element={<Lazy><About /></Lazy>} />
+        <Route path="glosario" element={<Lazy><Glossary /></Lazy>} />
         <Route
           path="*"
           element={

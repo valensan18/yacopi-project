@@ -7,6 +7,9 @@ import PageHeader from '../components/PageHeader'
 import { DataQualityBadge } from '../components/DataQualityBadge'
 import Disclaimer from '../components/Disclaimer'
 import ZhgReferenceCard from '../components/ZhgReferenceCard'
+import InterpretationCard from '../components/InterpretationCard'
+import HelpTip from '../components/HelpTip'
+import { interpretFlags, interpretGeneral } from '../lib/interpretation'
 import { EmptyState, ErrorState, LoadingSkeleton } from '../components/states'
 import { formatArea, formatCoordinates, NO_DATA } from '../lib/format'
 import styles from './ParcelDetail.module.css'
@@ -91,8 +94,22 @@ export default function ParcelDetail() {
       {item && (
         <div className={styles.layout}>
           <article className={styles.main}>
+            <InterpretationCard>
+              {interpretGeneral(item).map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </InterpretationCard>
+
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Identificación</h2>
+              <h2 className={styles.sectionTitle}>
+                Identificación{' '}
+                <HelpTip label="Qué significa la identificación del predio">
+                  Identifica al predio dentro del catálogo público. El identificador
+                  es opaco: no revela matrículas ni datos personales. El destino
+                  económico es la categoría registrada en la fuente, y la subzona es
+                  una subdivisión geoeconómica interna.
+                </HelpTip>
+              </h2>
               <dl className={styles.definitionGrid}>
                 <div>
                   <dt>Identificador público</dt>
@@ -126,7 +143,15 @@ export default function ParcelDetail() {
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Superficies</h2>
+              <h2 className={styles.sectionTitle}>
+                Superficies{' '}
+                <HelpTip label="Qué significan las superficies">
+                  El área catastral es la registrada en la fuente predial; el área
+                  ZHF proviene de la otra fuente del estudio. Cuando difieren mucho,
+                  se marca una alerta de calidad y se evitan cálculos de
+                  consolidación que podrían ser engañosos.
+                </HelpTip>
+              </h2>
               <dl className={styles.definitionGrid}>
                 <div>
                   <dt>Área catastral del terreno</dt>
@@ -148,7 +173,14 @@ export default function ParcelDetail() {
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Ubicación</h2>
+              <h2 className={styles.sectionTitle}>
+                Ubicación{' '}
+                <HelpTip label="Qué significa la ubicación">
+                  Las coordenadas son puntos referenciales de la fuente ZHF: sirven
+                  para ubicar el predio en el mapa, pero no representan un polígono
+                  catastral oficial.
+                </HelpTip>
+              </h2>
               <dl className={styles.definitionGrid}>
                 <div>
                   <dt>Coordenadas referenciales</dt>
@@ -173,7 +205,15 @@ export default function ParcelDetail() {
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Atributos territoriales</h2>
+              <h2 className={styles.sectionTitle}>
+                Atributos territoriales{' '}
+                <HelpTip label="Qué significan los atributos territoriales">
+                  Son clasificaciones de las fuentes (zonas homogéneas físicas,
+                  coberturas, vocación). Los códigos se muestran tal como vienen en
+                  la fuente; su decodificación oficial no está disponible en este
+                  proyecto, por lo que no se les asigna un significado inventado.
+                </HelpTip>
+              </h2>
               <dl className={styles.definitionGrid}>
                 {FEATURE_LABELS.map(([key, label]) => (
                   <div key={key}>
@@ -192,17 +232,34 @@ export default function ParcelDetail() {
             <ZhgReferenceCard publicId={item.public_id} />
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Alertas de calidad</h2>
+              <h2 className={styles.sectionTitle}>
+                Alertas de calidad{' '}
+                <HelpTip label="Qué significan las alertas de calidad">
+                  Son avisos sobre inconsistencias o faltantes de las fuentes. No
+                  eliminan el predio: indican qué información conviene revisar
+                  antes de sacar conclusiones.
+                </HelpTip>
+              </h2>
               {item.quality_flags.length === 0 ? (
                 <p className={styles.note}>Sin alertas de calidad registradas.</p>
               ) : (
-                <ul className={styles.flagList}>
-                  {item.quality_flags.map((flag) => (
-                    <li key={flag} title={flag}>
-                      <span>{FLAG_LABELS[flag] ?? flag}</span>
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <ul className={styles.flagList}>
+                    {item.quality_flags.map((flag) => (
+                      <li key={flag} title={flag}>
+                        <span>{FLAG_LABELS[flag] ?? flag}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <InterpretationCard
+                    title="Qué significan estas alertas para este predio"
+                    variant="warning"
+                  >
+                    {interpretFlags(item.quality_flags).map((line) => (
+                      <p key={line}>{line}</p>
+                    ))}
+                  </InterpretationCard>
+                </>
               )}
             </section>
           </article>

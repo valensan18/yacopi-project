@@ -292,6 +292,34 @@
   padding-top: var(--s2);
 }
 
+.demoWarnings {
+  margin-top: var(--s2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.demoWarningPrimary {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--amber-data);
+}
+
+.demoDetails {
+  margin-top: var(--s2);
+  color: var(--stone);
+  font-size: 0.9rem;
+}
+
+.demoDetails summary {
+  cursor: pointer;
+  color: var(--copper);
+}
+
+.demoDetails .warnings {
+  margin-top: var(--s1);
+}
+
 .demoResult {
   margin-top: var(--s3);
   background: var(--ink-2);

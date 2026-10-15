@@ -5,6 +5,9 @@ import type { SystemStatus, ZhgDemoResponse } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
 import ZhgReferenceCard from '../components/ZhgReferenceCard'
+import InterpretationCard from '../components/InterpretationCard'
+import HelpTip from '../components/HelpTip'
+import { domainLabel, interpretDemo } from '../lib/interpretation'
 import { ErrorState, LoadingSkeleton } from '../components/states'
 import { formatCop, formatCopPerHa } from '../lib/format'
 import styles from './Prediction.module.css'
@@ -230,22 +233,49 @@ function ZhgDemoSection() {
                 <div>
                   <p className={styles.demoLabel}>Diferencia</p>
                   <p className={`${styles.demoValue} mono`}>
-                    {formatCop(demo.data.absolute_difference_cop_ha)}
+                    {formatCopPerHa(demo.data.absolute_difference_cop_ha)}
                     {demo.data.relative_difference_pct != null &&
                       ` (${demo.data.relative_difference_pct} %)`}
                   </p>
                 </div>
               </div>
               <p className={styles.demoMeta}>
-                Zona {demo.data.zone_code} · dominio:{' '}
-                <span className="mono">{demo.data.domain_status}</span> · unidad{' '}
-                <span className="mono">{demo.data.unit}</span>
+                Zona {demo.data.zone_code} ·{' '}
+                {domainLabel(demo.data.domain_status)}{' '}
+                <HelpTip label="Qué significa el estado del dominio">
+                  Indica que los valores del predio están dentro de los rangos y
+                  categorías con los que se ajustó la demostración. No significa
+                  precisión garantizada ni validación independiente.
+                </HelpTip>
               </p>
-              <ul className={styles.warnings}>
-                {demo.data.limitations.map((limitation) => (
-                  <li key={limitation}>{limitation}</li>
-                ))}
-              </ul>
+
+              {(() => {
+                const interpretation = interpretDemo(demo.data)
+                const secundarias = demo.data.limitations.filter(
+                  (lim) => !interpretation.destacadas.some((d) => lim.includes(d.slice(0, 40))),
+                )
+                return (
+                  <>
+                    <div className={styles.demoWarnings}>
+                      {interpretation.destacadas.map((line) => (
+                        <p key={line} className={styles.demoWarningPrimary}>• {line}</p>
+                      ))}
+                    </div>
+                    <InterpretationCard title="¿Qué significa este resultado para el predio?">
+                      <p>{interpretation.complemento}</p>
+                    </InterpretationCard>
+                    <details className={styles.demoDetails}>
+                      <summary>Ver todas las limitaciones</summary>
+                      <ul className={styles.warnings}>
+                        {secundarias.map((limitation) => (
+                          <li key={limitation}>{limitation}</li>
+                        ))}
+                      </ul>
+                    </details>
+                  </>
+                )
+              })()}
+
               <p className={styles.demoDisclaimer}>{demo.data.disclaimer}</p>
             </div>
           )}

@@ -117,6 +117,15 @@
   color: var(--copper);
 }
 
+.distinctions {
+  padding-left: var(--s3);
+  color: var(--chalk);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  line-height: 1.6;
+}
+
 @media (max-width: 1023px) {
   .twoCol {
     grid-template-columns: 1fr;

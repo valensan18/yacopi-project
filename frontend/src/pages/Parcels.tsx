@@ -6,6 +6,7 @@ import { apiGet } from '../api/client'
 import type { OverviewStats, ParcelPage } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import { DataQualityBadge } from '../components/DataQualityBadge'
+import HelpTip from '../components/HelpTip'
 import { EmptyState, ErrorState, LoadingSkeleton } from '../components/states'
 import { formatArea, formatCoordinates, formatInt } from '../lib/format'
 import styles from './Parcels.module.css'
@@ -88,7 +89,12 @@ export default function Parcels() {
 
       <form className={styles.searchForm} onSubmit={submitSearch} role="search">
         <label className={styles.searchLabel} htmlFor="buscar-predio">
-          Buscar por identificador público
+          Buscar por identificador público{' '}
+          <HelpTip label="Qué es el identificador público">
+            Es un código interno del catálogo (como «p_ab12…») que identifica el
+            predio sin revelar matrículas ni datos personales. Escribe uno
+            completo para abrir su ficha.
+          </HelpTip>
         </label>
         <div className={styles.searchRow}>
           <input
@@ -219,7 +225,15 @@ export default function Parcels() {
                   <th scope="col" className={styles.num}>Construcción</th>
                   <th scope="col">Subzona</th>
                   <th scope="col">Coordenadas</th>
-                  <th scope="col">Calidad</th>
+                  <th scope="col">
+                    Calidad{' '}
+                    <HelpTip label="Qué significa la columna de calidad">
+                      Indica si el predio tiene alertas por inconsistencias o
+                      faltantes en las fuentes. «Sin alertas» no significa que
+                      los datos estén certificados; «N alertas» invita a revisar
+                      la ficha antes de sacar conclusiones.
+                    </HelpTip>
+                  </th>
                   <th scope="col"><span className="sr-only">Acciones</span></th>
                 </tr>
               </thead>

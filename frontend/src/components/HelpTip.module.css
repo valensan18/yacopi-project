@@ -1,0 +1,55 @@
+.container {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.trigger {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-accent);
+  background: transparent;
+  color: var(--copper);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  background: rgba(201, 123, 74, 0.18);
+  outline: 2px solid var(--copper);
+  outline-offset: 2px;
+}
+
+.popover {
+  position: absolute;
+  z-index: 70;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(18rem, calc(100vw - 2rem));
+  background: var(--ink-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  padding: var(--s2);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--chalk);
+  box-shadow: var(--shadow-card);
+}
+
+.popover::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--ink-2);
+}

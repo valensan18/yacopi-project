@@ -3,6 +3,7 @@ import { apiGet } from '../api/client'
 import type { SystemStatus } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
+import HelpTip from '../components/HelpTip'
 import { ErrorState, LoadingSkeleton } from '../components/states'
 import { formatCopPerHa, formatInt } from '../lib/format'
 import styles from './Models.module.css'
@@ -193,7 +194,16 @@ export default function Models() {
       </section>
 
       <section className={styles.statusSection}>
-        <h2 className={styles.sectionTitle}>Métricas reales del experimento (exp-proxy-001)</h2>
+        <h2 className={styles.sectionTitle}>
+          Métricas reales del experimento (exp-proxy-001){' '}
+          <HelpTip label="Cómo leer MAE, RMSE y R²">
+            <p>MAE: error absoluto promedio, en COP/ha (cuánto se equivoca en
+            promedio).</p>
+            <p>RMSE: mide el error penalizando más las equivocaciones grandes.</p>
+            <p>R²: cuánto de la variación explica el modelo; puede ser negativa
+            si es peor que usar el promedio.</p>
+          </HelpTip>
+        </h2>
         <p className={styles.tableNote}>
           Valores ejecutados y documentados en <span className="mono">docs/04_metodologia_ml.md</span>.
           La selección se hizo por menor MAE en el test espacial sellado.
@@ -206,6 +216,41 @@ export default function Models() {
           La validación espacial es más exigente que la aleatoria (Random Forest: R² 0,74
           frente a 0,82): los predios vecinos comparten territorio y la partición aleatoria
           infla el rendimiento si no se controla. Por eso se reportan ambas.
+        </p>
+      </section>
+
+      <section className={styles.statusSection}>
+        <h2 className={styles.sectionTitle}>Experimentos del valor del suelo (ZHG)</h2>
+        <p>
+          Para el objetivo del anteproyecto (valor catastral del suelo rural) se
+          distingue claramente entre:
+        </p>
+        <ul className={styles.distinctions}>
+          <li>
+            <strong>Experimentos históricos de Fase 5:</strong> compararon cinco
+            algoritmos con el valor unitario ZHG. Ninguno superó el criterio de
+            generalización a zonas nuevas (la referencia trivial ganó).{' '}
+            <em>Ningún modelo fue aprobado como candidato.</em>
+          </li>
+          <li>
+            <strong>Artefacto experimental actual (exp-zhg-001-demo):</strong>{' '}
+            demostración de Random Forest para predios de zonas conocidas,
+            desactivada por defecto. Se ajustó sobre los 7.709 predios, por lo
+            que ninguna consulta es una evaluación independiente.
+          </li>
+          <li>
+            <strong>Referencia ZHG conocida:</strong> dato territorial consultable
+            (no es una predicción).
+          </li>
+          <li>
+            <strong>Predicción oficial:</strong> continúa deshabilitada (503)
+            porque la etiqueta del valor exclusivo del suelo sigue pendiente.
+          </li>
+        </ul>
+        <p className={styles.tableNote}>
+          Que un modelo acierte en predios conocidos no garantiza buen desempeño
+          en zonas nuevas: en Fase 5 los modelos colapsaron al dejar zonas
+          completas fuera del entrenamiento.
         </p>
       </section>
 

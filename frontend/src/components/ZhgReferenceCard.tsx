@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { apiGet } from '../api/client'
 import type { ZhgReferenceResponse } from '../api/types'
 import { formatArea, formatCopPerHa, formatInt, NO_DATA } from '../lib/format'
+import { interpretZones } from '../lib/interpretation'
+import InterpretationCard from './InterpretationCard'
 import { ErrorState, LoadingSkeleton } from './states'
 import styles from './ZhgReferenceCard.module.css'
 
@@ -152,6 +154,12 @@ export default function ZhgReferenceCard({ publicId }: { publicId: string }) {
               <li key={limitation}>{limitation}</li>
             ))}
           </ul>
+
+          <InterpretationCard>
+            {interpretZones(query.data).map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </InterpretationCard>
         </>
       )}
     </section>

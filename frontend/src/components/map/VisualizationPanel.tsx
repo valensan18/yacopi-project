@@ -4,6 +4,7 @@ import {
   MIN_OPACITY,
   MIN_RADIUS,
 } from '../../lib/map-utils'
+import HelpTip from '../HelpTip'
 import styles from './VisualizationPanel.module.css'
 
 interface VisualizationPanelProps {
@@ -56,6 +57,17 @@ export default function VisualizationPanel({
 
       {open && (
         <div id="viz-panel-body" className={styles.body}>
+          <p className={styles.panelNote}>
+            Cada punto del mapa es un predio con coordenadas referenciales de la
+            fuente ZHF (no un polígono oficial). El color corresponde al destino
+            económico registrado; las diferencias de color no representan
+            diferencias de valor económico.{' '}
+            <HelpTip label="Qué significan los puntos del mapa">
+              Los puntos son ubicaciones referenciales de predios. El color indica
+              el destino económico. Las capas y los filtros solo cambian la
+              visualización: nunca alteran los datos de los predios.
+            </HelpTip>
+          </p>
           <div className={styles.control}>
             <label htmlFor="opacidad-puntos">
               Opacidad de los puntos

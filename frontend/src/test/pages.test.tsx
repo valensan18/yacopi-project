@@ -308,6 +308,17 @@ describe('Pantalla Predicción', () => {
     })
     expect(screen.getByText('Estimación experimental')).toBeInTheDocument()
     expect(screen.getByText('Diferencia')).toBeInTheDocument()
+    // Corrección A: diferencia en COP/ha
+    expect(screen.getAllByText(/COP\/ha/).length).toBeGreaterThan(0)
+    // Corrección B: in_domain traducido, no código crudo
+    expect(
+      screen.getByText(/dentro de los rangos y categorías admitidos/),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/^in_domain$/)).not.toBeInTheDocument()
+    // Corrección C: advertencias prioritarias visibles
+    expect(screen.getByText(/participó en el ajuste del modelo experimental/)).toBeInTheDocument()
+    expect(screen.getByText('¿Qué significa este resultado para el predio?')).toBeInTheDocument()
+    expect(screen.getByText('Ver todas las limitaciones')).toBeInTheDocument()
     expect(screen.getAllByText(/no constituye un avalúo individual certificado/).length).toBeGreaterThan(0)
   })
 })

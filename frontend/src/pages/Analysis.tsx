@@ -4,6 +4,7 @@ import { apiGet } from '../api/client'
 import type { OverviewStats } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
+import HelpTip from '../components/HelpTip'
 import { ErrorState, LoadingSkeleton } from '../components/states'
 import { formatInt, formatNumber } from '../lib/format'
 import styles from './Analysis.module.css'
@@ -35,17 +36,22 @@ function ChartSection({
   unit,
   source,
   summary,
+  help,
   children,
 }: {
   title: string
   unit: string
   source: string
   summary: string
+  help: string
   children: React.ReactNode
 }) {
   return (
     <section className={styles.chartSection}>
-      <h2 className={styles.chartTitle}>{title}</h2>
+      <h2 className={styles.chartTitle}>
+        {title}{' '}
+        <HelpTip label={`Cómo interpretar: ${title}`}>{help}</HelpTip>
+      </h2>
       <div className={styles.chart} role="img" aria-label={summary}>
         {children}
       </div>
@@ -151,6 +157,7 @@ export default function Analysis() {
       <div className={styles.grid}>
         <ChartSection
           title="Predios por destino económico"
+          help="Cada barra cuenta los predios de cada categoría económica registrada en la fuente. No es un valor económico: solo muestra cuántos predios hay por destino."
           unit="Predios (conteo)"
           source={`API · /statistics/overview · ${data.dataset_version}`}
           summary={`El destino Agropecuario concentra ${formatInt(data.por_destino_economico[0]?.n ?? 0)} de los ${formatInt(total)} predios, seguido de ${formatInt(data.por_destino_economico[1]?.n ?? 0)} predios ${data.por_destino_economico[1]?.key ?? ''}.`}
@@ -165,6 +172,7 @@ export default function Analysis() {
 
         <ChartSection
           title="Predios por subzona"
+          help="Muestra cu?ntos predios caen en cada subzona geoecon?mica. Sirve para ver c?mo se reparte el territorio estudiado."
           unit="Predios (conteo)"
           source={`API · /statistics/overview · ${data.dataset_version}`}
           summary={`Las subzonas con más registros son 14 (${formatInt(data.por_subzona[0]?.n ?? 0)}) y 05 (${formatInt(data.por_subzona[1]?.n ?? 0)}).`}
@@ -179,6 +187,7 @@ export default function Analysis() {
 
         <ChartSection
           title="Distribución del área catastral del terreno"
+          help="El eje horizontal agrupa los predios por rango de tamaño en hectáreas y el vertical cuenta cuántos hay en cada rango. Permite ver si predominan predios pequeños o grandes."
           unit="Rangos de área (ha)"
           source={`API · /statistics/distributions · ${areaData.dataset_version}`}
           summary={`El área mediana de los predios es de ${formatNumber((data.area.media_m2 ?? 0) / 10_000)} ha; el predio más grande registra ${formatNumber((data.area.max_m2 ?? 0) / 10_000)} ha.`}
@@ -193,6 +202,7 @@ export default function Analysis() {
 
         <ChartSection
           title="Predios con construcción registrada"
+          help="Proporción de predios con superficie construida registrada. Es relevante porque el avalúo total no puede leerse como valor exclusivo del suelo."
           unit="Predios (proporción)"
           source={`API · /statistics/overview · ${data.dataset_version}`}
           summary={`${formatInt(data.con_construccion)} predios (${formatNumber((data.con_construccion / total) * 100)} %) registran superficie construida: por eso el avalúo total no puede tratarse como valor exclusivo del suelo.`}
