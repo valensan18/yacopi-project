@@ -151,7 +151,30 @@ quedar explícita en el artículo (así lo exige el propio anteproyecto:
 "las estimaciones… no reemplazarán una valoración catastral o comercial
 oficial").
 
-## 10. Restricciones cumplidas en esta auditoría
+## 11. ACTUALIZACIÓN — Fase 5 (evidencia del software de Valentina)
+
+Añadido el 2026-10-14, sin borrar la auditoría original. La inspección del
+software anterior confirmó y refinó los hallazgos:
+
+- Su objetivo era `valor_hectarea_agropecuario` (COP/ha) y la equivalencia
+  con `ZHG_VALOR_` por zona quedó **verificada exactamente** (11 zonas, 11
+  valores; códigos normalizados a 2 dígitos).
+- Su experimento "integrado" alcanzó **R²=1.0 con RMSE≈0**: memorización de
+  la zona mediante estadísticos zonales no bloqueados (`latitud_promedio`,
+  modas, conteos). Su experimento honesto "interseccion" no superó el
+  baseline (R²≈−0,01).
+- El nuevo experimento ZHG de Atlas Vivo (Fase 5, bloqueando 44 columnas
+  con fuga y usando 4 escenarios de validación + leave-one-zone-out)
+  confirma: **ningún modelo de ML supera la referencia trivial en zonas no
+  observadas**; el criterio de aceptación predefinido resultó `false` y no
+  se eligió ganador. Ver `docs/06_fase5_modelo_valor_suelo_zhg.md`.
+- Implicación para la matriz (§3): OE2 permanece **Parcial** y se documenta
+  con más rigor: con los datos actuales la predicción ML defendible del
+  valor del suelo no es alcanzable; quedan abiertas las opciones A
+  (consulta directa de referencia zonal, no-ML), B (modelo experimental con
+  limitaciones) y C (nuevos datos), a decisión del director.
+
+## 12. Restricciones cumplidas en esta auditoría
 
 Sin cambios en frontend/backend/modelos/CSV; sin reentrenamiento; sin push;
 el documento rector y los datos personales de sus autores **no** se

@@ -346,6 +346,44 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## FASE 5 — Modelo del valor catastral del suelo: experimento ZHG (COMPLETADA 2026-10-14)
+
+### Decisiones tomadas
+
+- Alcance comunicado por los responsables: el software se orienta al **valor
+  catastral del suelo rural** (no precio comercial). No se atribuye al
+  director una aprobación formal; la opción ZHG quedó como experimento
+  técnico documentado (Ruta C).
+- Inspección del software anterior de Valentina (solo lectura): objetivo
+  `valor_hectarea_agropecuario` = `ZHG_VALOR_` (equivalencia verificada en
+  las 11 zonas); su dataset "integrado" tenía fuga por estadísticos zonales
+  (R²=1.0, RMSE≈0); su experimento honesto no superaba el baseline.
+- Nuevo pipeline experimental `yacopi_ml/zhg/` (modo research): dataset a
+  nivel predio (objetivos dominante y ponderado con reglas de cobertura),
+  4 escenarios de validación (filas/predio/espacial/zonas) +
+  leave-one-zone-out, baselines mediana y moda zonal, criterio de
+  aceptación predefinido, allowlist 20 / bloqueadas 44.
+
+### Resultados reales (resumen; detalle en `docs/06_fase5_modelo_valor_suelo_zhg.md`)
+
+- Escenarios con zonas compartidas: Forest MAE 73.765 COP/ha, R² 0,82
+  (reproduce la zona, no valora independientemente).
+- **Zonas fuera**: todos los modelos con R² negativo; la "moda zonal"
+  trivial gana (168.954 vs 423.363 Forest). Leave-one-zone-out colapsa.
+- Criterio predefinido: `aceptado = false` → **no se elige modelo
+  ganador**. Opciones A/B/C documentadas para decisión del director.
+- Predicción oficial: sigue **503 MODEL_NOT_READY** (verificado por la
+  suite de backend intacta). Artefactos `exp-zhg-001` y
+  `exp-zhg-001-ponderado` locales (no versionados, no registrados como
+  candidatos).
+
+### Pruebas
+
+66/66 (8 nuevas de ZHG: equivalencia, fuga, cobertura, splits, smoke LOO);
+`ruff` limpio.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
@@ -354,6 +392,7 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 | 2. Modelos (Ruta B) | **Completada (experimental)** | Modelo oficial sigue pendiente de etiqueta |
 | 3. Backend FastAPI | **Completada** | — |
 | 4. Frontend React | **Completada funcionalmente** | Pendiente revisión visual del usuario |
+| 5. Modelo valor catastral (ZHG) | **Completada (experimental, sin ganador)** | Decisión del director: opciones A/B/C |
 | 5. Integración | No iniciada | — |
 | 6. Pruebas y rendimiento | No iniciada | — |
 | 7. Despliegue VPS | No iniciada | Sin VPS (diferido) |
