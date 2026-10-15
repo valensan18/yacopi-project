@@ -87,14 +87,15 @@ idénticos a los nuestros (mismos tamaños: 35.320.477 y 17.306.426 bytes).
 
 ## 8. Auditoría de fuga (Fase 5C)
 
-`ml/config/features_zhg.yaml` fija la allowlist (20 variables: 5 numéricas —
-áreas y coordenadas reales del predio — y 14 categóricas ZHF/UPS/CLC) y
-**44 bloqueadas**: identificadores, objetivo y equivalentes (`ZHG_VALOR_`,
-`ZHG_VALOR1`, `valor_hectarea_agropecuario`), avalúo total y derivados,
-códigos/subzonas geoeconómicas, derivados de intersección, coordenadas
-proyectadas, geometrías y **todos los estadísticos zonales del software
-anterior** (`latitud_promedio`, `n_registros_zhf`, modas zonales…), cuya
-fuga está demostrada por el R²=1.0 del experimento integrado de Valentina.
+`ml/config/features_zhg.yaml` fija la allowlist (**19** variables: 5
+numéricas — áreas y coordenadas reales del predio — y 14 categóricas
+ZHF/UPS/CLC) y **57 bloqueadas**: identificadores, objetivo y equivalentes
+(`ZHG_VALOR_`, `ZHG_VALOR1`, `valor_hectarea_agropecuario`), avalúo total y
+derivados, códigos/subzonas geoeconómicas, derivados de intersección,
+coordenadas proyectadas, geometrías y **todos los estadísticos zonales del
+software anterior** (`latitud_promedio`, `n_registros_zhf`, modas zonales…),
+cuya fuga está demostrada por el R²=1.0 del experimento integrado de
+Valentina.
 
 Diferencias clave:
 - **Coordenadas reales del predio** (`tr_latitud/tr_longitud`): permitidas
@@ -137,8 +138,17 @@ MAE (COP/ha) por escenario:
 | CatBoost | 104.549 | 98.707 | 222.561 | 423.863 | 372.833 |
 
 R² en el escenario zona: todos los modelos **negativos** (−0,19 a −2,18 en
-dominante; −0,26 a −1,93 en ponderado). Leave-one-zone-out: R² colapsa
-(hasta −10²⁸); MAE por zona de 106.605 a 2.543.423 COP/ha.
+dominante; −0,26 a −1,93 en ponderado).
+
+**Corrección documental (2026-10-14):** el R² del *leave-one-zone-out* **no
+es interpretable** y se retira de la interpretación: cada test contiene un
+único valor objetivo constante (una zona), por lo que la suma de cuadrados
+total es ≈0 (ruido de punto flotante de 1e-17 a 1e-20). Los valores
+astronómicos (−10²⁸) registrados en `metrics.json` son artefactos
+numéricos, no métricas científicas; el código de métricas ahora devuelve
+R² indefinido (NaN) cuando el objetivo es constante (con prueba
+automatizada). Para LOO se reportan **MAE y MdAPE** únicamente: MAE por
+zona de 106.605 a 2.543.423 COP/ha.
 
 **Lectura:** en escenarios con zonas compartidas (1–3) los modelos "aprenden
 la zona" a través de coordenadas reales y atributos físicos y reducen el

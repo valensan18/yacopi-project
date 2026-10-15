@@ -28,7 +28,10 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
 
     ss_res = float(np.sum(error**2))
     ss_tot = float(np.sum((y_true - y_true.mean()) ** 2))
-    r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
+    # R² no es interpretable cuando el objetivo es (casi) constante en la
+    # muestra: ss_tot≈0 por ruido de punto flotante produce valores
+    # astronómicos sin sentido (p. ej. test de una sola zona).
+    r2 = 1.0 - ss_res / ss_tot if ss_tot > 1e-9 else float("nan")
 
     return {
         "n": int(len(y_true)),

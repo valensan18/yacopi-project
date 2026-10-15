@@ -110,3 +110,17 @@ class TestMetricasSinteticas:
         m = compute_metrics(y, y)
         assert m["mae_cop_ha"] == 0.0
         assert m["r2"] == 1.0
+
+    def test_r2_no_interpretable_con_objetivo_constante(self):
+        y = np.full(50, 547247.2)
+        pred = np.full(50, 600000.0)
+        m = compute_metrics(y, pred)
+        assert np.isnan(m["r2"])
+        assert np.isfinite(m["mae_cop_ha"])
+
+    def test_r2_no_interpretable_con_ruido_de_punto_flotante(self):
+        # reproduce el artefacto del leave-one-zone-out (ss_tot ~ 1e-17)
+        y = np.array([547247.2, 547247.20000000001, 547247.19999999999])
+        pred = np.array([600000.0, 500000.0, 550000.0])
+        m = compute_metrics(y, pred)
+        assert np.isnan(m["r2"])

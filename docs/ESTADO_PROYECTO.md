@@ -362,7 +362,7 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
   nivel predio (objetivos dominante y ponderado con reglas de cobertura),
   4 escenarios de validación (filas/predio/espacial/zonas) +
   leave-one-zone-out, baselines mediana y moda zonal, criterio de
-  aceptación predefinido, allowlist 20 / bloqueadas 44.
+  aceptación predefinido, allowlist 19 / bloqueadas 57.
 
 ### Resultados reales (resumen; detalle en `docs/06_fase5_modelo_valor_suelo_zhg.md`)
 
