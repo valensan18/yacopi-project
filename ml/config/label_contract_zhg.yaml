@@ -1,0 +1,26 @@
+# Contrato de etiqueta del EXPERIMENTO ZHG (Fase 5, Ruta C experimental).
+# NO reemplaza label_contract.yaml (sigue pending_verification) ni
+# label_contract_proxy.yaml (histórico). Categoría: experimental.
+label_name: valor_suelo_referencia_zhg_cop_ha
+unit: COP/ha
+source_status: research_zhg            # experimental; nunca production
+source_kind: referencia_zonal
+source_file: interseccion_terrenos_zhg_r1_yacopi.csv
+source_column: valor_hectarea_agropecuario
+equivalence_verified: ZHG_VALOR_       # verificado en Fase 5A (por zona, códigos normalizados)
+reference_date: null
+area_column_used: area_en_zonageoeconomica_m2 (solo consolidación ponderada)
+construction_value_excluded: null      # el valor zonal es referencia de terreno por zona; no hay avalúo individual
+approved_by: null
+approval_note: >
+  Decisión técnica experimental documentada (docs/06). No es un avalúo
+  catastral individual certificado ni un valor comercial. La equivalencia
+  con ZHG_VALOR_ se verificó por zona, pero no existe documentación que
+  certifique procedencia oficial y vigencia del valor zonal.
+production_eligible: false
+notes: >
+  El objetivo solo tiene 11 valores posibles (uno por zona). Un modelo que
+  identifique la zona (directa o indirectamente) memoriza la etiqueta. La
+  validación debe incluir escenarios por predio, espacial y dejando zonas
+  completas fuera. La "consulta directa" de la tabla zonal no es predicción
+  de aprendizaje automático y no se presentará como tal.

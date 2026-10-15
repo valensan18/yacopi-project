@@ -1,0 +1,115 @@
+# Variables del EXPERIMENTO ZHG (Fase 5).
+# Allowlist estricta: solo características de predio disponibles en inferencia.
+# Todo agregado zonal (promedios, modas, conteos por zona) queda PROHIBIDO:
+# con 11 zonas, cualquier estadístico zonal identifica la etiqueta.
+features:
+  allowed:
+    - name: area_terreno_catastral_m2
+      kind: numeric
+      unit: m2
+    - name: area_zhf_m2
+      kind: numeric
+      unit: m2
+    - name: area_construida_m2
+      kind: numeric
+      unit: m2
+    - name: tr_latitud
+      kind: numeric
+      notes: coordenada REAL del predio (no promedio zonal)
+    - name: tr_longitud
+      kind: numeric
+      notes: coordenada REAL del predio (no promedio zonal)
+    - name: destino_economico
+      kind: categorical
+    - name: zhf_codigo
+      kind: categorical
+    - name: zhf_dispon
+      kind: categorical
+    - name: zhf_influe
+      kind: categorical
+    - name: zhf_uso_ac
+      kind: categorical
+    - name: aht_vpoten
+      kind: categorical
+    - name: vus_vocaci
+      kind: categorical
+    - name: ups
+      kind: categorical
+    - name: clc_nivel1
+      kind: categorical
+    - name: clc_nivel2
+      kind: categorical
+    - name: clc_nivel3
+      kind: categorical
+    - name: clc_nivel4
+      kind: categorical
+    - name: clc_nivel5
+      kind: categorical
+    - name: clc_nivel6
+      kind: categorical
+
+blocked:
+  # Identificadores
+  - numero_predial
+  - numero_predial_anterior
+  - codigo_orip
+  - matricula_inmobiliaria
+  - codigo_lote
+  - CODPRED
+  - id
+  # Objetivo y equivalentes (fuga directa)
+  - valor_hectarea_agropecuario
+  - ZHG_VALOR_
+  - ZHG_VALOR1
+  - valor_suelo_referencia_zhg_cop_ha
+  # Avalúo total y derivados
+  - valor_avaluo
+  - valor_avaluo_total_cop
+  - referencia_avaluo_total_por_ha_cop
+  # Códigos y contexto geoeconómico
+  - codigo_zona_geoeconomica
+  - zona_code
+  - ZHG_CODIGO
+  - ZHG_SUBZON
+  - zhg_codigo_predominante
+  - zhg_codigo_zhf
+  - zhg_porcentaje_predominante
+  - zhg_subzona
+  - referencia_zhg_valor_predominante_cop_ha
+  - referencia_zhg_valor_ponderado_cop_ha
+  - referencia_zhg_valor_zhf_cop_ha
+  - referencia_zhg_valor1_zhf_cop_ha
+  # Derivados de intersección/área (reconstruyen zona o valor)
+  - area_en_zonageoeconomica_m2
+  - porcentaje_en_zonageo_respecto_suma
+  - suma_porcentaje_intersecciones
+  - suma_area_intersecciones_m2
+  - razon_area_intersecciones_catastral
+  - razon_area_zhf_catastral
+  - razon_area_geo_zhg_zhf
+  # Estadísticos zonales del software anterior (memorización comprobada)
+  - latitud_promedio
+  - longitud_promedio
+  - este_promedio
+  - norte_promedio
+  - n_registros_zhf
+  - area_zhf_total_ha
+  - area_zhf_promedio_ha
+  - zhf_codigo_moda
+  - zhf_dispon_moda
+  - zhf_influe_moda
+  - zhf_uso_actual_moda
+  - subzona_moda
+  - cobertura_nivel1_moda
+  - cobertura_nivel2_moda
+  - cobertura_nivel3_moda
+  - aptitud_moda
+  - frontera_agricola_moda
+  - vocacion_moda
+  - ups_moda
+  # Coordenadas proyectadas y geometrías crudas
+  - tr_este
+  - tr_norte
+  - geom
+  - geometria
+  - geometria_interseccion
