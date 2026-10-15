@@ -174,6 +174,14 @@ class ExperimentalZhgService:
         relative = round(100.0 * absolute / reference, 2) if reference > 0 else None
         membership = self.membership.get(public_id, {})
 
+        # El artefacto se ajustó sobre los 7.709 predios con zona conocida:
+        # toda consulta corresponde a un predio del conjunto de ajuste.
+        fit_warning = (
+            "Este predio forma parte de los datos utilizados para ajustar el "
+            "modelo experimental. La diferencia mostrada no constituye una "
+            "evaluación independiente de exactitud."
+        )
+
         return {
             "public_id": public_id,
             "model_id": self.manifest.get("model_id", ARTIFACT_DIR),
@@ -188,13 +196,15 @@ class ExperimentalZhgService:
             "domain_status": "in_domain",
             "source_description": SOURCE_DESCRIPTION,
             "reference_date": None,
-            "limitations": DEMO_LIMITATIONS,
+            "limitations": [fit_warning, *DEMO_LIMITATIONS],
             "evaluation_context": {
+                "formo_parte_del_ajuste": True,
                 "split_membership": membership,
                 "nota": (
-                    "la pertenencia a una partición histórica se informa sin "
-                    "identificadores privados; una predicción sobre un predio "
-                    "del entrenamiento no demuestra generalización"
+                    "el artefacto se ajustó sobre todos los predios con zona "
+                    "conocida (7.709): ninguna consulta es una evaluación "
+                    "independiente; la pertenencia a particiones históricas se "
+                    "informa sin identificadores privados"
                 ),
             },
             "disclaimer": DEMO_DISCLAIMER,

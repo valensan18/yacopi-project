@@ -1,7 +1,9 @@
-"""Pruebas de la demostración experimental ZHG (Fase 7B)."""
+"""Pruebas de la demostración experimental ZHG (Fase 7B/7C)."""
 
 import re
+from pathlib import Path
 
+import pytest
 from app.core.config import Settings
 from app.main import create_app
 from conftest import build_mini_zhg_demo, public_id_for
@@ -69,6 +71,11 @@ class TestDemoHabilitada:
         assert body["zone_code"] == "07"
         assert body["domain_status"] == "in_domain"
         assert body["evaluation_context"]["split_membership"]["predio"] == "train"
+        assert body["evaluation_context"]["formo_parte_del_ajuste"] is True
+        assert any(
+            "forma parte de los datos utilizados para ajustar" in lim
+            for lim in body["limitations"]
+        )
         assert any("no constituye un avalúo" in lim for lim in body["limitations"])
         assert not re.search(r"\d{30}", str(body))
 
@@ -154,3 +161,89 @@ class TestOficialIntacto:
             })
         assert response.status_code == 503
         assert response.json()["error"]["code"] == "MODEL_NOT_READY"
+
+
+REAL_DB = Path(__file__).resolve().parents[2] / "data" / "parcels.db"
+REAL_ARTIFACT = (
+    Path(__file__).resolve().parents[2] / "ml" / "artifacts" / "exp-zhg-001-demo"
+)
+
+
+@pytest.mark.skipif(
+    not (REAL_DB.exists() and (REAL_ARTIFACT / "model.joblib").exists()),
+    reason="base o artefacto real no presentes",
+)
+class TestE2EConArtefactoReal:
+    """Prueba end-to-end aislada con la base y el artefacto REALES."""
+
+    def _client(self):
+        settings = Settings(
+            database_path=REAL_DB,
+            model_dir=REAL_ARTIFACT.parent,
+            experimental_zhg_enabled=True,  # habilitación temporal en pruebas
+            _env_file=None,
+        )
+        return TestClient(create_app(settings))
+
+    def _ids(self):
+        import sqlite3
+
+        conn = sqlite3.connect(REAL_DB)
+        conn.row_factory = sqlite3.Row
+        mono = conn.execute(
+            "SELECT p.public_id FROM parcels p "
+            "JOIN parcel_zhg_references z ON z.public_id = p.public_id "
+            "GROUP BY p.public_id HAVING COUNT(*) = 1 LIMIT 1"
+        ).fetchone()["public_id"]
+        multi = conn.execute(
+            "SELECT p.public_id FROM parcels p "
+            "JOIN parcel_zhg_references z ON z.public_id = p.public_id "
+            "GROUP BY p.public_id HAVING COUNT(*) > 1 LIMIT 1"
+        ).fetchone()["public_id"]
+        conn.close()
+        return mono, multi
+
+    def test_flujo_completo(self):
+        mono, multi = self._ids()
+        with self._client() as client:
+            # 1. predio monozona válido
+            r = client.post("/api/v1/predictions/experimental-zhg",
+                            json={"public_id": mono})
+            assert r.status_code == 200
+            body = r.json()
+            assert body["predicted_zhg_cop_ha"] > 0
+            assert body["reference_zhg_cop_ha"] > 0
+            assert body["evaluation_context"]["formo_parte_del_ajuste"] is True
+            assert any(
+                "no constituye una evaluación independiente" in lim
+                for lim in body["limitations"]
+            )
+            assert not re.search(r"\d{30}", str(body))
+
+            # 2. predio multizona rechazado
+            r = client.post("/api/v1/predictions/experimental-zhg",
+                            json={"public_id": multi})
+            assert r.status_code == 422
+            assert r.json()["error"]["code"] == "UNSUPPORTED_MULTIZONE"
+
+            # 3. identificador inexistente
+            r = client.post("/api/v1/predictions/experimental-zhg",
+                            json={"public_id": "p_noexiste"})
+            assert r.status_code == 404
+
+            # 4. oficial intacto
+            r = client.post("/api/v1/predictions", json={"features": {}})
+            assert r.status_code == 503
+
+    def test_deshabilitada_por_defecto_con_artefacto_real(self):
+        settings = Settings(
+            database_path=REAL_DB,
+            model_dir=REAL_ARTIFACT.parent,
+            experimental_zhg_enabled=False,
+            _env_file=None,
+        )
+        with TestClient(create_app(settings)) as client:
+            r = client.post("/api/v1/predictions/experimental-zhg",
+                            json={"public_id": "p_x"})
+        assert r.status_code == 503
+        assert r.json()["error"]["code"] == "EXPERIMENTAL_ZHG_DISABLED"
