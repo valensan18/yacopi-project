@@ -502,6 +502,22 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## FASE 8.5 — Predicción visible y preparación VPS (COMPLETADA)
+
+- Enlace **Predicción** en la navegación principal; **ParcelSelector**
+  (combobox accesible con autocompletado) en Predicción para seleccionar
+  predios sin copiar identificadores; timeouts de red (15 s) en el cliente.
+- Backend: filtro `public_id_prefix` en `/properties` (aditivo) y errores
+  sin rutas internas del servidor.
+- Latencia real de inferencia demo medida: p50 81,8 ms / p95 84,0 ms
+  (n=60, local); artefacto 51 MB en disco.
+- Propuesta técnica VPS en `docs/13_preparacion_vps.md` (servicios, env,
+  proxy inverso, HTTPS, recursos, persistencia, actualización, riesgos).
+  Sin despliegue, sin DNS, sin push; oficial sigue 503.
+- Pruebas: 94 pytest + 28 vitest; ruff/oxlint limpios; build OK.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
