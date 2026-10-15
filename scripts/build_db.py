@@ -135,6 +135,28 @@ CREATE TABLE zhf_only_parcels (
   zhg_codigo TEXT
 );
 
+CREATE TABLE zhg_zones (
+  zone_code TEXT PRIMARY KEY,
+  value_cop_ha REAL NOT NULL,
+  source_column TEXT NOT NULL,
+  source_file TEXT NOT NULL
+);
+
+CREATE TABLE parcel_zhg_references (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  public_id TEXT NOT NULL REFERENCES parcels(public_id),
+  zone_code TEXT NOT NULL,
+  value_cop_ha REAL,
+  area_intersection_m2 REAL,
+  share_pct REAL,
+  coverage_status TEXT NOT NULL,
+  source_file TEXT NOT NULL,
+  dataset_version TEXT NOT NULL,
+  UNIQUE(public_id, zone_code)
+);
+CREATE INDEX idx_zhg_refs_parcel ON parcel_zhg_references(public_id);
+CREATE INDEX idx_zhg_refs_zone ON parcel_zhg_references(zone_code);
+
 CREATE TABLE dataset_meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
@@ -167,6 +189,7 @@ def build(db_path: Path, processed: Path, dataset_version: str) -> dict:
     consolidated = read_rows(processed / "03_predios_consolidados.csv")
     flags = read_rows(processed / "05_banderas_calidad.csv")
     solo_zhf = read_rows(processed / "04_predios_solo_zhf.csv")
+    intersections = read_rows(processed / "01_intersecciones_normalizadas.csv")
     flags_by_id = {r["numero_predial"]: r for r in flags}
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -250,6 +273,69 @@ def build(db_path: Path, processed: Path, dataset_version: str) -> dict:
                 ),
             )
 
+        # --- Referencias ZHG por predio (Fase 6B, fuentes normalizadas) ---
+        zone_map: dict[str, float] = {}
+        per_predio: dict[str, dict] = {}
+        for row in intersections:
+            zone = str(row["codigo_zona_geoeconomica"]).zfill(2)
+            value = fnum(row["valor_hectarea_agropecuario"])
+            if value is not None and value > 0:
+                zone_map[zone] = value
+            pred = row["numero_predial"]
+            entry = per_predio.setdefault(
+                pred, {"area": fnum(row["area_terreno_m2"]) or 0.0, "zones": {}}
+            )
+            zone_entry = entry["zones"].setdefault(
+                zone, {"area": 0.0, "share": 0.0, "value": value}
+            )
+            zone_entry["area"] += fnum(row["area_en_zonageoeconomica_m2"]) or 0.0
+            zone_entry["share"] += fnum(
+                row["porcentaje_en_zonageo_respecto_suma"]
+            ) or 0.0
+            zone_entry["value"] = value
+
+        for row in consolidated:
+            public_id = public_id_for(row["numero_predial"])
+            entry = per_predio.get(row["numero_predial"])
+            if not entry or not entry["zones"]:
+                continue
+            area = entry["area"]
+            suma = sum(z["area"] for z in entry["zones"].values())
+            if area > 0 and suma > 0:
+                rel = abs(suma - area) / area
+                coverage = (
+                    "consistente" if rel <= 0.01 else
+                    "dudosa" if rel <= 0.05 else "no_apta"
+                )
+            else:
+                coverage = "no_apta"
+            for zone, zone_entry in entry["zones"].items():
+                conn.execute(
+                    """INSERT INTO parcel_zhg_references
+                           (public_id, zone_code, value_cop_ha,
+                            area_intersection_m2, share_pct, coverage_status,
+                            source_file, dataset_version)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        public_id, zone, zone_entry["value"],
+                        zone_entry["area"], zone_entry["share"],
+                        coverage, "01_intersecciones_normalizadas.csv",
+                        dataset_version,
+                    ),
+                )
+
+        for zone, value in sorted(zone_map.items()):
+            conn.execute(
+                """INSERT INTO zhg_zones (zone_code, value_cop_ha,
+                       source_column, source_file)
+                   VALUES (?, ?, ?, ?)""",
+                (
+                    zone, value, "valor_hectarea_agropecuario",
+                    "interseccion_terrenos_zhg_r1_yacopi.csv (equivalente a "
+                    "ZHG_VALOR_; verificado por zona en Fase 5A)",
+                ),
+            )
+
         meta = {
             "dataset_version": dataset_version,
             "generated_at": "ver manifest local",
@@ -258,6 +344,7 @@ def build(db_path: Path, processed: Path, dataset_version: str) -> dict:
             "quality_flag_rows": n_flags_total,
             "label_status": "pending_verification",
             "model_targets_rows": 0,
+            "zhg_zones": len(zone_map),
         }
         for key, value in meta.items():
             conn.execute(
@@ -284,6 +371,10 @@ def build(db_path: Path, processed: Path, dataset_version: str) -> dict:
         ).fetchone()[0],
         "parcels_con_alertas": conn.execute(
             "SELECT COUNT(*) FROM parcels WHERE tiene_alertas_calidad = 1"
+        ).fetchone()[0],
+        "zhg_zones": conn.execute("SELECT COUNT(*) FROM zhg_zones").fetchone()[0],
+        "parcel_zhg_references": conn.execute(
+            "SELECT COUNT(*) FROM parcel_zhg_references"
         ).fetchone()[0],
     }
     conn.close()

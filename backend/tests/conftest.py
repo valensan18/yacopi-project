@@ -58,6 +58,29 @@ def build_minimal_db(path: Path) -> None:
         conn.execute(
             "INSERT INTO dataset_meta (key, value) VALUES ('dataset_version', 'test-v1')"
         )
+        # Referencias ZHG de prueba (Fase 6B)
+        conn.execute(
+            """INSERT INTO zhg_zones (zone_code, value_cop_ha, source_column, source_file)
+               VALUES ('03', 1368119.6, 'valor_hectarea_agropecuario', 'test'),
+                      ('06', 547247.2, 'valor_hectarea_agropecuario', 'test')"""
+        )
+        zhg_fixture = [
+            # (source_id, zone, value, area, share, coverage)
+            ("A", "03", 1368119.6, 50000.0, 100.0, "consistente"),
+            ("B", "03", 1368119.6, 1200.0, 50.0, "dudosa"),
+            ("B", "06", 547247.2, 1200.0, 50.0, "dudosa"),
+            ("C", "03", 1368119.6, 100000.0, 66.6, "no_apta"),
+            ("C", "06", 547247.2, 50000.0, 33.3, "no_apta"),
+            ("E", "06", 547247.2, 80000.0, 100.0, "consistente"),
+        ]
+        for source_id, zone, value, area, share, coverage in zhg_fixture:
+            conn.execute(
+                """INSERT INTO parcel_zhg_references
+                       (public_id, zone_code, value_cop_ha, area_intersection_m2,
+                        share_pct, coverage_status, source_file, dataset_version)
+                   VALUES (?, ?, ?, ?, ?, ?, 'test', 'test-v1')""",
+                (public_id_for(source_id), zone, value, area, share, coverage),
+            )
     conn.close()
 
 

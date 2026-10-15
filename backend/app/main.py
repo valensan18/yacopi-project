@@ -24,6 +24,7 @@ from .routers import (
     models,
     predictions,
     properties,
+    references,
     statistics,
     system,
 )
@@ -107,6 +108,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     for router in (
         health.router, system.router, properties.router,
         statistics.router, maps.router, models.router, predictions.router,
+        references.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
 

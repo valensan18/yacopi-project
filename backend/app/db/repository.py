@@ -205,3 +205,27 @@ def area_percentiles(conn: sqlite3.Connection) -> dict:
         "MAX(area_terreno_catastral_m2) AS max_m2 FROM parcels"
     ).fetchone()
     return {"min_m2": row["min_m2"], "max_m2": row["max_m2"]}
+
+
+def get_zhg_zones(conn: sqlite3.Connection) -> list[dict]:
+    rows = conn.execute(
+        "SELECT zone_code, value_cop_ha, source_column, source_file "
+        "FROM zhg_zones ORDER BY zone_code"
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def parcel_exists(conn: sqlite3.Connection, public_id: str) -> bool:
+    return conn.execute(
+        "SELECT 1 FROM parcels WHERE public_id = ?", (public_id,)
+    ).fetchone() is not None
+
+
+def get_parcel_zhg(conn: sqlite3.Connection, public_id: str) -> list[dict]:
+    rows = conn.execute(
+        "SELECT zone_code, value_cop_ha, area_intersection_m2, share_pct, "
+        "coverage_status, source_file "
+        "FROM parcel_zhg_references WHERE public_id = ? ORDER BY zone_code",
+        (public_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
