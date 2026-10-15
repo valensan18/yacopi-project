@@ -129,6 +129,9 @@ export const GLOSSARY: GlossaryTerm[] = [
   { termino: 'Evaluación independiente', categoria: 'ml',
     definicion: 'Medición del modelo con datos que no participaron en su ajuste.',
     interpretacion: 'En la demostración actual TODOS los predios participaron del ajuste, por lo que la diferencia mostrada no es una evaluación independiente.' },
+  { termino: 'Experimento histórico (proxy)', categoria: 'ml',
+    definicion: 'Experimento anterior del proyecto (Fase 2) cuyo objetivo era el avalúo catastral total por hectárea.',
+    interpretacion: 'Se conserva por trazabilidad técnica, pero NO es el modelo de la demostración actual (Random Forest sobre la referencia zonal ZHG) y sus métricas no se mezclan con las del experimento ZHG.' },
 
   // ---- Calidad de la información ----
   { termino: 'Fuente de los datos', categoria: 'calidad',

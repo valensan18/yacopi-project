@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import SystemStatusBanner from './SystemStatusBanner'
+import { APP_DESCRIPTION_CORTA } from '../lib/appContent'
 import styles from './AppShell.module.css'
 
 const NAV_ITEMS = [
@@ -107,11 +108,7 @@ export default function AppShell() {
       <footer className={styles.footer}>
         <div className="container">
           <p className={styles.footerText}>
-            <strong>ATLAS VIVO</strong> · Prototipo académico — Ingeniería de Sistemas y
-            Computación. Las estimaciones son de apoyo académico y{' '}
-            <strong>no constituyen avalúo oficial</strong> ni sustituyen la valoración
-            catastral. El modelo predictivo es experimental y estima un proxy de avalúo
-            catastral total por hectárea.
+            <strong>ATLAS VIVO</strong> · {APP_DESCRIPTION_CORTA}
           </p>
           <p className={styles.footerMono}>
             dataset {location.pathname === '/' ? '—' : ''} · municipio de Yacopí,

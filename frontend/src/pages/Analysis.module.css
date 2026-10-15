@@ -79,6 +79,11 @@
   margin-top: var(--s1);
 }
 
+.inlineLink {
+  color: var(--copper);
+  text-decoration: underline;
+}
+
 @media (max-width: 1023px) {
   .grid {
     grid-template-columns: 1fr;

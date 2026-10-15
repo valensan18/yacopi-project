@@ -11,10 +11,17 @@ function fullText(data: SystemStatus): string {
   const base = pending
     ? 'Modelo predictivo pendiente de validación: el valor exclusivo del suelo (COP/ha) aún no está confirmado.'
     : 'Modelo validado disponible.'
+  const notes: string[] = []
   if (data.experimental_model?.habilitado) {
-    return `${base} Inferencia experimental del proxy activa (solo desarrollo).`
+    notes.push('Inferencia experimental del proxy histórico activa (solo desarrollo).')
   }
-  return `${base} La predicción oficial permanece deshabilitada.`
+  if (data.experimental_zhg?.habilitado) {
+    notes.push('Demostración experimental de Random Forest activa (solo desarrollo).')
+  }
+  if (notes.length === 0) {
+    notes.push('La predicción oficial permanece deshabilitada.')
+  }
+  return `${base} ${notes.join(' ')}`
 }
 
 export default function SystemStatusBanner() {

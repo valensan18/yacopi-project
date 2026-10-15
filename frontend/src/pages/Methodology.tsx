@@ -25,7 +25,7 @@ const CRISP_DM = [
     etapa: '4 · Modelado',
     estado: 'experimental',
     texto:
-      'Comparación de baseline, Ridge, árbol, Random Forest y CatBoost sobre un proxy experimental (avalúo total por hectárea). Ajuste solo con validación espacial agrupada; test sellado.',
+      'Comparación de baseline, Ridge, árbol, Random Forest y CatBoost. Primero con un proxy experimental de avalúo total por hectárea (Fase 2, histórico) y luego con la referencia zonal ZHG (Fase 5, experimento vigente). Ajuste solo con validación espacial agrupada; test sellado.',
   },
   {
     etapa: '5 · Evaluación',
@@ -143,10 +143,13 @@ export default function Methodology() {
         </section>
 
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Limitaciones del proxy catastral</h2>
+          <h2 className={styles.sectionTitle}>Experimentos históricos: limitaciones del proxy catastral</h2>
           <p>
-            El experimento predice <strong>avalúo catastral total por hectárea</strong>.
-            Tres límites: (1) puede incluir construcciones; (2) el área está en el
+            Como experimento histórico (Fase 2) se evaluó un modelo cuyo objetivo era
+            el <strong>avalúo catastral total por hectárea</strong>. Se conserva por
+            trazabilidad técnica, pero no es el modelo de la demostración actual
+            (Random Forest sobre la referencia zonal ZHG). Tres límites de aquel
+            experimento: (1) puede incluir construcciones; (2) el área está en el
             denominador del proxy y también entre las entradas, generando una relación
             mecánica parcial; (3) no hay fecha de valoración ni diccionario oficial de
             códigos. Por eso ningún resultado se presenta como valor del suelo.

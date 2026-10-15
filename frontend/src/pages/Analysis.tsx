@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import Plot from 'react-plotly.js'
 import { apiGet } from '../api/client'
 import type { OverviewStats } from '../api/types'
@@ -240,8 +241,12 @@ export default function Analysis() {
       <Disclaimer title="Estadística descriptiva, no resultado de ML">
         <p>
           Todo lo anterior describe la muestra real del estudio. Ningún gráfico de esta
-          pantalla es una predicción ni una métrica del modelo: los resultados de
-          aprendizaje automático se presentan aparte, en la pantalla Modelos.
+          pantalla es una predicción ni una métrica de un modelo: los experimentos y
+          sus resultados históricos están en la pantalla{' '}
+          <Link to="/modelos" className={styles.inlineLink}>Modelos</Link>, y la
+          demostración experimental se ejecuta en{' '}
+          <Link to="/prediccion" className={styles.inlineLink}>Predicción</Link> cuando
+          está habilitada.
         </p>
       </Disclaimer>
     </div>

@@ -1,5 +1,6 @@
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
+import { APP_DESCRIPTION_EXTENDIDA } from '../lib/appContent'
 import styles from './About.module.css'
 
 const TECNOLOGIAS = [
@@ -54,7 +55,7 @@ export default function About() {
           <ol className={styles.flow}>
             <li>CSV originales → auditoría y consolidación (offline)</li>
             <li>SQLite curada → API FastAPI (consulta, estadísticas, mapas)</li>
-            <li>Entrenamiento offline (experimento proxy) → artefacto verificado</li>
+            <li>Referencias zonales ZHG (dato) + artefacto experimental verificado</li>
             <li>React consume la API; la predicción oficial permanece bloqueada</li>
           </ol>
         </section>
@@ -74,10 +75,16 @@ export default function About() {
 
       <Disclaimer title="Limitaciones y advertencias">
         <p>
+          {APP_DESCRIPTION_EXTENDIDA}
+        </p>
+        <p>
           Los datos descriptivos provienen de dos fuentes sin diccionario oficial ni
-          fechas de valoración. El modelo es experimental y estima un proxy de avalúo
-          catastral total por hectárea, no el valor exclusivo del suelo. Nada de este
-          sistema constituye avalúo oficial ni recomendación comercial.
+          fechas de valoración. El componente predictivo es una{' '}
+          <strong>demostración experimental de Random Forest</strong> que estima un
+          valor unitario de referencia zonal en COP/ha: no constituye un avalúo
+          individual certificado ni un precio comercial, no tiene evaluación
+          independiente para el artefacto actual y no se ha demostrado que generalice
+          a zonas nuevas. La predicción oficial permanece deshabilitada.
         </p>
       </Disclaimer>
     </div>

@@ -131,7 +131,7 @@ export default function Models() {
       <PageHeader
         kicker="Modelos · Ciencia"
         title="Sistema predictivo"
-        lede="Estado real del componente de aprendizaje automático. El modelo oficial del valor exclusivo del suelo no existe todavía; solo hay un experimento con un proxy, debidamente rotulado."
+        lede="Estado real del componente de aprendizaje automático. El modelo oficial del valor exclusivo del suelo no existe todavía; la aplicación ofrece la referencia zonal ZHG (dato) y una demostración experimental de Random Forest, junto con los experimentos históricos debidamente identificados."
       />
 
       <section className={styles.statusSection}>
@@ -149,7 +149,7 @@ export default function Models() {
       </section>
 
       <section className={styles.statusSection}>
-        <h2 className={styles.sectionTitle}>Experimento proxy (Ruta B)</h2>
+        <h2 className={styles.sectionTitle}>Experimento proxy (histórico, Fase 2)</h2>
         <p>
           Para comparar metodológicamente los algoritmos se entrenó un modelo con una
           variable <strong>diferente</strong>: el{' '}

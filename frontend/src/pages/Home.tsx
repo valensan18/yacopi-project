@@ -208,12 +208,17 @@ function ModelSection() {
         <div className={styles.modelNotice} data-reveal>
           <p className="mono">Aviso metodológico</p>
           <p>
-            El único modelo disponible es <strong>experimental</strong>: predice un{' '}
-            <em>proxy</em> de avalúo catastral total por hectárea. No es el valor del
-            suelo ni un avalúo oficial, y su inferencia está desactivada por defecto.
+            La aplicación ofrece la <strong>referencia zonal ZHG</strong> de cada
+            predio (dato consultable en COP/ha) y una{' '}
+            <strong>demostración experimental de Random Forest</strong> que estima ese
+            valor unitario de referencia. Ninguna de las dos es un avalúo individual
+            certificado, y la predicción oficial sigue deshabilitada.
           </p>
           <Link to="/modelos" className={styles.textLink}>
             Ver comparación de modelos →
+          </Link>
+          <Link to="/prediccion" className={styles.textLink}>
+            Ir a la predicción →
           </Link>
         </div>
       </div>
