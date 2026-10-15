@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Inicio', exact: true },
   { to: '/predios', label: 'Predios' },
   { to: '/mapa', label: 'Mapa' },
+  { to: '/prediccion', label: 'Predicción' },
   { to: '/exploracion', label: 'Análisis' },
   { to: '/modelos', label: 'Modelos' },
   { to: '/metodologia', label: 'Metodología' },

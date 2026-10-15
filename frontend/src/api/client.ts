@@ -33,7 +33,9 @@ export async function apiGet<T>(
   params?: Record<string, string | number>,
   signal?: AbortSignal,
 ): Promise<T> {
-  const response = await fetch(buildUrl(path, params), { signal })
+  const timeout = AbortSignal.timeout(15_000)
+  const combined = signal ? AbortSignal.any([signal, timeout]) : timeout
+  const response = await fetch(buildUrl(path, params), { signal: combined })
   return parseResponse<T>(response)
 }
 
@@ -42,6 +44,7 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15_000),
   })
   return parseResponse<T>(response)
 }
@@ -61,4 +64,8 @@ async function parseResponse<T>(response: Response): Promise<T> {
     throw new ApiError('INTERNAL_ERROR', 'Respuesta inesperada de la API', response.status)
   }
   return payload as T
+}
+
+export function isTimeoutError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === 'TimeoutError'
 }

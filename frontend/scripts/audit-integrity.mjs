@@ -24,7 +24,11 @@ async function auditViewport(viewport, label) {
   const cartoTiles = { ok: 0, fail: 0 }
   page.on('response', (res) => {
     if (res.url().includes('basemaps.cartocdn.com') && res.url().includes('.png')) {
-      res.status() === 200 ? cartoTiles.ok++ : cartoTiles.fail++
+      if (res.status() === 200) {
+        cartoTiles.ok += 1
+      } else {
+        cartoTiles.fail += 1
+      }
     }
   })
 
@@ -102,6 +106,29 @@ async function auditViewport(viewport, label) {
   await page.waitForTimeout(400)
   const glo = await page.evaluate(() => document.body.innerText)
   report['/glosario: busqueda'] = { filtra: glo.includes('Error absoluto promedio') }
+
+  // Navegación: enlace Predicción visible (escritorio) o en el menú móvil
+  await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded' })
+  await page.waitForTimeout(1_000)
+  let navVisible = await page.getByRole('link', { name: 'Predicción' }).count() > 0
+  if (!navVisible) {
+    const menuButton = page.getByRole('button', { name: /Abrir menú/ })
+    if ((await menuButton.count()) > 0) {
+      await menuButton.click()
+      await page.waitForTimeout(400)
+      navVisible = await page.getByRole('link', { name: 'Predicción' }).count() > 0
+    }
+  }
+  report['nav: enlace Predicción'] = { accesible: navVisible }
+
+  // Selector de predios en Predicción (combobox con opciones reales)
+  await page.goto(`${BASE}/prediccion`, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('text=Comprobar estado oficial (real)', { timeout: 25_000 })
+  const combo = page.getByRole('combobox').first()
+  await combo.fill('p_00')
+  await page.waitForSelector('[role="option"]', { timeout: 15_000 })
+  const opciones = await page.locator('[role="option"]').count()
+  report['/prediccion: selector'] = { opciones: opciones > 0 ? opciones : 0 }
 
   // Errores de consola acumulados
   report.erroresConsolaTotales = Object.values(consoleErrors).reduce((a, b) => a + b, 0)

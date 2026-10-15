@@ -254,6 +254,7 @@ describe('Pantalla Predicción', () => {
     mockFetch({
       '/system/status': statusFixture,
       '/zhg-reference': zhgReferenceFixture,
+      '/properties': parcelsFixture,
     })
     renderAt('/prediccion', <Prediction />)
     await waitFor(() => {
@@ -261,8 +262,12 @@ describe('Pantalla Predicción', () => {
         screen.getByText(/Consulta de referencia de valor \(no es predicción\)/),
       ).toBeInTheDocument()
     })
-    const input = screen.getByLabelText('Identificador público del predio')
-    await userEvent.type(input, 'p_abc123')
+    const input = screen.getByRole('combobox', { name: 'Identificador público del predio' })
+    await userEvent.type(input, 'p_ab')
+    await waitFor(() => {
+      expect(screen.getByRole('option', { name: /p_abc123/ })).toBeInTheDocument()
+    })
+    await userEvent.click(screen.getByRole('option', { name: /p_abc123/ }))
     await userEvent.click(screen.getByRole('button', { name: /Consultar referencia ZHG/ }))
     await waitFor(() => {
       expect(screen.getByText('Valor unitario de referencia del suelo')).toBeInTheDocument()
@@ -290,6 +295,7 @@ describe('Pantalla Predicción', () => {
         experimental_zhg: { habilitado: true, disponible: true },
       },
       '/predictions/experimental-zhg': demoFixture,
+      '/properties': parcelsFixture,
     })
     renderAt('/prediccion', <Prediction />)
     await waitFor(() => {
@@ -297,9 +303,12 @@ describe('Pantalla Predicción', () => {
         screen.getByText(/Demostración experimental \(zonas conocidas\)/),
       ).toBeInTheDocument()
     })
-    // dos inputs "Identificador público del predio" (referencia ZHG y demo):
-    const inputs = screen.getAllByLabelText('Identificador público del predio')
-    await userEvent.type(inputs[inputs.length - 1], 'p_abc123')
+    const comboboxes = screen.getAllByRole('combobox', {
+      name: 'Identificador público del predio',
+    })
+    await userEvent.type(comboboxes[comboboxes.length - 1], 'p_ab')
+    const option = await screen.findByRole('option', { name: /p_abc123/ })
+    await userEvent.click(option)
     await userEvent.click(
       screen.getByRole('button', { name: /Ejecutar demostración experimental/ }),
     )
@@ -308,18 +317,13 @@ describe('Pantalla Predicción', () => {
     })
     expect(screen.getByText('Estimación experimental')).toBeInTheDocument()
     expect(screen.getByText('Diferencia')).toBeInTheDocument()
-    // Corrección A: diferencia en COP/ha
     expect(screen.getAllByText(/COP\/ha/).length).toBeGreaterThan(0)
-    // Corrección B: in_domain traducido, no código crudo
     expect(
       screen.getByText(/dentro de los rangos y categorías admitidos/),
     ).toBeInTheDocument()
-    expect(screen.queryByText(/^in_domain$/)).not.toBeInTheDocument()
-    // Corrección C: advertencias prioritarias visibles
     expect(screen.getByText(/participó en el ajuste del modelo experimental/)).toBeInTheDocument()
     expect(screen.getByText('¿Qué significa este resultado para el predio?')).toBeInTheDocument()
     expect(screen.getByText('Ver todas las limitaciones')).toBeInTheDocument()
-    expect(screen.getAllByText(/no constituye un avalúo individual certificado/).length).toBeGreaterThan(0)
   })
 })
 

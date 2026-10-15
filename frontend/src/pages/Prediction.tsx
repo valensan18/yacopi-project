@@ -7,6 +7,7 @@ import Disclaimer from '../components/Disclaimer'
 import ZhgReferenceCard from '../components/ZhgReferenceCard'
 import InterpretationCard from '../components/InterpretationCard'
 import HelpTip from '../components/HelpTip'
+import ParcelSelector from '../components/ParcelSelector'
 import { domainLabel, interpretDemo } from '../lib/interpretation'
 import { ErrorState, LoadingSkeleton } from '../components/states'
 import { formatCop, formatCopPerHa } from '../lib/format'
@@ -108,14 +109,10 @@ function ZhgLookupSection() {
           Identificador público del predio
         </label>
         <div className={styles.searchRow}>
-          <input
+          <ParcelSelector
             id="zhg-public-id"
-            className={styles.searchInput}
-            type="text"
-            placeholder="p_ab12cd34ef567890"
             value={input}
-            maxLength={32}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={setInput}
           />
           <button type="submit" className={styles.searchButton}>
             Consultar referencia ZHG
@@ -189,14 +186,10 @@ function ZhgDemoSection() {
               Identificador público del predio
             </label>
             <div className={styles.searchRow}>
-              <input
+              <ParcelSelector
                 id="zhg-demo-id"
-                className={styles.searchInput}
-                type="text"
-                placeholder="p_ab12cd34ef567890"
                 value={input}
-                maxLength={32}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={setInput}
               />
               <button type="submit" className={styles.searchButton} disabled={demo.isPending}>
                 {demo.isPending ? 'Calculando…' : 'Ejecutar demostración experimental'}
