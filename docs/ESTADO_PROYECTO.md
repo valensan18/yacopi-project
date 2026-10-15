@@ -428,6 +428,26 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## FASE 7B — Demostración experimental de ML (COMPLETADA, desactivada por defecto)
+
+- Artefacto `exp-zhg-001-demo` (Random Forest, 19 características, 7.709
+  predios) construido de forma determinística y trazable
+  (`yacopi_ml.zhg.export_demo.py`). Hallazgo de integridad documentado: los
+  hashes de las particiones congeladas actuales difieren de los históricos
+  (regeneradas tras Fase 5); las métricas de Fase 5 quedan intactas como
+  históricas y este artefacto no se presenta como el modelo evaluado.
+- Endpoint `POST /predictions/experimental-zhg` (por `public_id` opaco,
+  features derivadas del artefacto) con guards de dominio: monozona,
+  referencia positiva, rangos numéricos y categorías vistas, predicción
+  física finita; desactivado por defecto (`EXPERIMENTAL_ZHG_ENABLED=false`).
+- `/prediccion`: sección "Demostración experimental (zonas conocidas)"
+  (flag off → explicación sin controles falsos; flag on → estimación +
+  referencia + diferencia + limitaciones).
+- Oficial intacto: **503 MODEL_NOT_READY**. Pruebas: 88 pytest + 19 vitest;
+  Playwright escritorio/móvil 7/7 sin errores de consola. Ver `docs/10`.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
