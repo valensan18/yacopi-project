@@ -44,8 +44,10 @@
 }
 
 .singleMeta {
-  color: var(--stone);
+  color: var(--chalk);
+  opacity: 0.9;
   margin-top: 0.3rem;
+  font-size: 0.9rem;
 }
 
 .tableWrap {
@@ -92,8 +94,9 @@
 }
 
 .dominantNote {
-  color: var(--stone);
-  font-size: 0.85rem;
+  color: var(--chalk);
+  opacity: 0.92;
+  font-size: 0.92rem;
   margin-top: var(--s1);
 }
 
@@ -109,8 +112,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
+  color: var(--chalk);
+  margin: 0;
+}
+
+.vigencia {
   color: var(--stone);
+  font-size: var(--fs-mono);
   margin: 0;
 }
 
@@ -147,28 +156,32 @@
 
 .statusNote {
   display: block;
-  color: var(--stone);
-  font-size: 0.78rem;
+  color: var(--chalk);
+  opacity: 0.92;
+  font-size: 0.85rem;
   margin-top: 0.2rem;
 }
 
 .noWeighted {
   margin: 0;
-  color: var(--stone);
-  font-size: 0.9rem;
+  color: var(--chalk);
+  opacity: 0.92;
+  font-size: 0.92rem;
 }
 
 .limitations {
   margin: 0;
   padding-left: var(--s3);
-  color: var(--stone);
-  font-size: 0.82rem;
+  color: var(--chalk);
+  opacity: 0.95;
+  font-size: 0.9rem;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.35rem;
 }
 
 .note {
-  color: var(--stone);
-  font-size: 0.9rem;
+  color: var(--chalk);
+  opacity: 0.92;
+  font-size: 0.92rem;
 }

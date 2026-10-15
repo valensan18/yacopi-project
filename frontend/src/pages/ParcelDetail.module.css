@@ -56,8 +56,15 @@
 }
 
 .note {
+  color: var(--chalk);
+  opacity: 0.92;
+  font-size: 0.95rem;
+}
+
+.codeFootnote {
   color: var(--stone);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  margin: var(--s2) 0 0;
 }
 
 .flagList {
@@ -72,17 +79,10 @@
 .flagList li {
   display: flex;
   gap: var(--s2);
-  font-size: 0.9rem;
+  font-size: 0.98rem;
   border-left: 2px solid var(--amber-data);
   padding-left: var(--s2);
   color: var(--chalk);
-}
-
-.flagList .mono {
-  color: var(--amber-data);
-  flex: none;
-  max-width: 60%;
-  overflow-wrap: anywhere;
 }
 
 .aside {

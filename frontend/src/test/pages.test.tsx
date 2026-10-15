@@ -190,7 +190,8 @@ describe('Pantalla Detalle de predio', () => {
       expect(screen.getAllByText('p_abc123').length).toBeGreaterThan(0)
     })
     expect(screen.getAllByText('No disponible').length).toBeGreaterThan(0)
-    expect(screen.getByText('contiene_construccion')).toBeInTheDocument()
+    expect(screen.getByText('Registra superficie construida')).toBeInTheDocument()
+    expect(screen.queryByText('contiene_construccion')).not.toBeInTheDocument()
     await waitFor(() => {
       expect(
         screen.getByText('Valor unitario de referencia del suelo'),

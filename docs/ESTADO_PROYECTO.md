@@ -409,6 +409,23 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
   `POST /predictions` sigue **503 MODEL_NOT_READY**.
 - Pruebas: 77 pytest + 17 vitest; ruff/oxlint limpios; build OK.
 
+### Ajustes de presentación (revisión visual de la ficha)
+
+- Tarjeta ZHG: "participación" aclarada como participación dentro de las
+  intersecciones zonales registradas (no cobertura catastral); línea
+  "Vigencia de la referencia: no disponible" (sustituye el técnico
+  "reference_date = null").
+- Alertas de calidad: solo descripciones legibles; el código interno queda
+  accesible en `title` al pasar el cursor, sin ensuciar la vista.
+- Atributos territoriales: etiquetas según diccionario + nota de que la
+  decodificación semántica oficial de los códigos está pendiente (sin
+  inventar significados).
+- Contraste y tamaño de textos secundarios mejorados (advertencias y
+  alertas). Mensajes de valoración coherentes: existe referencia zonal del
+  suelo, no avalúo individual certificado.
+- Verificación Playwright escritorio/móvil (`scripts/verify-detail.mjs`):
+  6/6 comprobaciones, 0 errores de consola, capturas en `docs/capturas/`.
+
 ---
 
 ## FASES 1–8 — Estado

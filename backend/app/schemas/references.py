@@ -8,8 +8,7 @@ UNIT = "COP/ha"
 DEFAULT_LIMITATIONS = [
     "Referencia zonal catastral; no es un avalúo individual certificado "
     "del predio.",
-    "La vigencia oficial del valor zonal no está acreditada en los datos "
-    "recibidos (reference_date = null).",
+    "Fecha de vigencia de la referencia: no disponible.",
     "No es una predicción de aprendizaje automático.",
 ]
 

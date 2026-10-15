@@ -48,10 +48,12 @@ export default function ZhgReferenceCard({ publicId }: { publicId: string }) {
                 {formatCopPerHa(query.data.zones[0].value_cop_ha ?? 0)}
               </p>
               <p className={`mono ${styles.singleMeta}`}>
-                Zona {query.data.zones[0].zone_code} · participación{' '}
+                Zona {query.data.zones[0].zone_code} · participación dentro de
+                las intersecciones zonales registradas:{' '}
                 {query.data.zones[0].share_pct != null
                   ? `${formatInt(query.data.zones[0].share_pct)} %`
-                  : NO_DATA}
+                  : NO_DATA}{' '}
+                (no equivale a la cobertura catastral del predio)
               </p>
             </div>
           ) : (
@@ -112,6 +114,9 @@ export default function ZhgReferenceCard({ publicId }: { publicId: string }) {
                 aria-hidden="true"
               />
               {COVERAGE_LABELS[query.data.coverage_status ?? 'no_apta']}
+            </p>
+            <p className={`mono ${styles.vigencia}`}>
+              Vigencia de la referencia: no disponible
             </p>
             {query.data.weighted_reference && (
               <p className={styles.weighted}>

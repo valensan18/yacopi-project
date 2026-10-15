@@ -32,11 +32,11 @@ const FLAG_LABELS: Record<string, string> = {
 }
 
 const FEATURE_LABELS: [string, string][] = [
-  ['zhf_codigo', 'Código ZHF'],
-  ['zhf_dispon', 'Disponibilidad ZHF'],
-  ['zhf_influe', 'Influencia ZHF'],
-  ['zhf_uso_ac', 'Uso actual ZHF'],
-  ['aht_vpoten', 'Aptitud potencial (AHT)'],
+  ['zhf_codigo', 'Código de zona homogénea física (ZHF)'],
+  ['zhf_dispon', 'Disponibilidad o condición física registrada (ZHF)'],
+  ['zhf_influe', 'Influencia o accesibilidad territorial (ZHF)'],
+  ['zhf_uso_ac', 'Uso actual del suelo registrado (ZHF)'],
+  ['aht_vpoten', 'Aptitud o potencial territorial (AHT)'],
   ['fa_element', 'Elemento (frontera agrícola)'],
   ['vus_vocaci', 'Vocación del suelo (VUS)'],
   ['ups', 'Uso principal del suelo (UPS)'],
@@ -182,6 +182,11 @@ export default function ParcelDetail() {
                   </div>
                 ))}
               </dl>
+              <p className={styles.codeFootnote}>
+                Los códigos (ZHF, AHT, UPS…) se muestran tal como vienen en la
+                fuente. Su decodificación semántica oficial está pendiente de
+                diccionario; no se inventan significados.
+              </p>
             </section>
 
             <ZhgReferenceCard publicId={item.public_id} />
@@ -193,8 +198,7 @@ export default function ParcelDetail() {
               ) : (
                 <ul className={styles.flagList}>
                   {item.quality_flags.map((flag) => (
-                    <li key={flag}>
-                      <span className="mono">{flag}</span>
+                    <li key={flag} title={flag}>
                       <span>{FLAG_LABELS[flag] ?? flag}</span>
                     </li>
                   ))}
@@ -206,11 +210,11 @@ export default function ParcelDetail() {
           <aside className={styles.aside}>
             <Disclaimer title="Sobre los valores">
               <p>
-                Esta ficha muestra datos catastrales y territoriales descriptivos, más la
-                <strong> referencia zonal ZHG</strong> (dato económico territorial, no un
-                avalúo individual).{' '}
-                <strong>No se muestra un avalúo del suelo</strong>: la fuente no permite
-                respaldar un valor exclusivo del terreno para este predio.
+                Esta ficha muestra la <strong>referencia zonal ZHG</strong> del
+                suelo (dato económico territorial verificado en las fuentes),
+                pero <strong>no un avalúo individual certificado</strong> del
+                predio: la fuente no permite respaldar un valor exclusivo del
+                terreno ni una tasación oficial.
               </p>
             </Disclaimer>
           </aside>
