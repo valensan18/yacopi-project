@@ -60,3 +60,7 @@ Thumbs.db
 
 # ===== Herramientas locales del agente (skills, comandos) =====
 .opencode/
+
+# ===== Recursos de despliegue (se transfieren por separado, nunca a Git) =====
+deploy-data/
+deploy-model/

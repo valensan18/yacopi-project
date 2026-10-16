@@ -1,0 +1,42 @@
+# Docker Compose — Atlas Vivo (producción).
+#
+# Red: el backend NO publica puertos al host; solo el frontend escucha en
+# 127.0.0.1:8080 (el Nginx del host hará de proxy inverso con HTTPS).
+# El puerto 8080 está restringido a loopback: no se expone en 0.0.0.0.
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      DATABASE_PATH: /app/data/parcels.db
+      MODEL_DIR: /app/model
+    volumes:
+      - ./deploy-data/parcels.db:/app/data/parcels.db:ro
+      - ./deploy-model:/app/model:ro
+    networks:
+      - atlas
+    # healthcheck definido en backend/Dockerfile
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - atlas
+    # healthcheck definido en frontend/Dockerfile
+
+networks:
+  atlas:
+    driver: bridge

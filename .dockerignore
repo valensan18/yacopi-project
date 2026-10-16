@@ -1,0 +1,33 @@
+# Contexto de build Docker: excluir TODO lo que no debe entrar en imágenes
+.git
+.github
+.venv
+.venv313
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+
+# Datos y artefactos privados: NUNCA dentro de imágenes
+data
+deploy-data
+deploy-model
+ml/artifacts
+
+# Frontend
+frontend/node_modules
+frontend/dist
+frontend/coverage
+
+# Secretos y entorno
+.env
+.env.*
+!.env.example
+
+# Documentación pesada y capturas
+docs/capturas
+*.db
+*.sqlite
+*.joblib
+*.cbm
+*.pkl

@@ -1,0 +1,17 @@
+# Dependencias de PRODUCCIÓN del backend, versiones exactas verificadas en
+# el entorno local (Python 3.14, Windows). No incluir herramientas de
+# desarrollo (pytest/ruff): esta es la lista de la imagen Docker.
+anyio==4.15.1
+catboost==1.2.10
+fastapi==0.143.0
+joblib==1.6.0
+numpy==2.5.4
+pandas==3.0.6
+pydantic==2.14.1
+pydantic-settings==2.15.0
+python-dotenv==1.2.4
+scikit-learn==1.9.1
+scipy==1.18.1
+starlette==1.8.0
+threadpoolctl==3.7.0
+uvicorn==0.54.0
