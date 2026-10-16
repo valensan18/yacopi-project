@@ -532,6 +532,27 @@ reproducibilidad, categorías desconocidas, artefacto real); `ruff` limpio.
 
 ---
 
+## DOCKERIZACIÓN Y PREPARACIÓN VPS (COMPLETADA, sin push ni despliegue)
+
+- `backend/Dockerfile` (python:3.14-slim, 1 worker, healthcheck, sin --reload),
+  `frontend/Dockerfile` (multietapa Node 24 → nginx:alpine con SPA fallback y
+  proxy /api), `compose.yaml` (backend sin puertos públicos; frontend solo en
+  127.0.0.1:8080), `.dockerignore` (datos/artefactos/secretos fuera de
+  imágenes), `backend/requirements.lock.txt` (versiones exactas verificadas),
+  `deploy/nginx-app.conf` y `deploy/README.md` (runbook Contabo).
+- Probado localmente con Docker real: build OK (backend 1,27 GB / frontend
+  82,6 MB), ambos healthy, 9 rutas SPA 200, API vía proxy (7.709 predios,
+  11 zonas), oficial 503, demo desactivada por defecto, reinicio con
+  persistencia, demo aislada con flag temporal (valores idénticos a los
+  locales), logs sin credenciales, sin exposición de archivos internos
+  (SPA fallback devuelve index.html, no los datos).
+- Auditoría Git: remote privado sin cambios; sin secretos en el historial;
+  `.env`, `deploy-data/` y `deploy-model/` ignorados (se transfieren por
+  scp). Recursos: inferencia p50 81,8 ms medida; RAM en VPS pendiente de
+  medir con `docker stats`. Pendiente de autorización: push y despliegue.
+
+---
+
 ## FASES 1–8 — Estado
 
 | Fase | Estado | Bloqueo |
