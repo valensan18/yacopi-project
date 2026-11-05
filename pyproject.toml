@@ -7,7 +7,15 @@ line-length = 100
 target-version = "py313"
 # Script heredado de la fase de datos previa: se conserva byte-idéntico como
 # referencia de reproducibilidad; su estilo no se ajusta en esta fase.
-exclude = ["scripts/preparar_datos.py"]
+# Los generadores de la entrega docente incrustan cadenas largas de celdas de
+# notebook y HTML; los cuadernos ejecutados son artefactos de documentación,
+# no código de aplicación.
+exclude = [
+    "scripts/preparar_datos.py",
+    "scripts/ejecutar_notebooks.py",
+    "scripts/generar_pdf.py",
+    "entrega_docente/notebooks",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

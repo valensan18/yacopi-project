@@ -1,0 +1,247 @@
+"""Genera el HTML del informe academico (luego convertido a PDF con Playwright)."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / "entrega_docente" / "ATLAS_VIVO_INFORME_ACADEMICO.html"
+
+COMMIT = subprocess.run(
+    ["git", "rev-parse", "--short", "HEAD"],
+    capture_output=True,
+    text=True,
+    cwd=ROOT,
+).stdout.strip()
+FECHA = datetime.now(UTC).strftime("%Y-%m-%d")
+
+resumen = json.loads(
+    (ROOT / "ml" / "artifacts" / "exp-valor-terreno-001" / "resumen.json").read_text(encoding="utf-8")
+)
+zhg = json.loads(
+    (ROOT / "ml" / "artifacts" / "exp-zhg-001" / "metrics.json").read_text(encoding="utf-8")
+)
+
+
+def filas_zhg(nombre: str) -> str:
+    z = zhg["scenarios"][nombre]["zona"]
+    p = zhg["scenarios"][nombre]["predio"]
+    return (
+        f"<tr><td>{nombre}</td><td>{p['r2']:.2f}</td><td>{z['r2']:.2f}</td>"
+        f"<td>{p['mae_cop_ha']:,.0f}</td><td>{z['mae_cop_ha']:,.0f}</td></tr>"
+    )
+
+
+def tabla_valor(esc: str) -> str:
+    filas = ""
+    orden = ["dummy_media", "ridge_log", "arbol", "random_forest", "catboost"]
+    pp = resumen[esc]["protocolos"]["predio"]["resultados"]
+    pe = resumen[esc]["protocolos"]["espacial"]["resultados"]
+    for nombre in orden:
+        p = pp[nombre]
+        e = pe[nombre]
+        filas += (
+            f"<tr><td>{nombre}</td><td>{p['r2']:.3f}</td><td>{e['r2']:.3f}</td>"
+            f"<td>{p['mae_cop_ha']:,.0f}</td><td>{e['mae_cop_ha']:,.0f}</td></tr>"
+        )
+    return filas
+
+
+html = f"""<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+  body {{ font-family: Georgia, serif; font-size: 10.5pt; line-height: 1.45; margin: 2.2cm 2cm; color: #1a1a1a; }}
+  h1 {{ font-size: 17pt; margin-bottom: 2pt; }}
+  h2 {{ font-size: 13pt; border-bottom: 1px solid #999; padding-bottom: 2pt; margin-top: 16pt; }}
+  h3 {{ font-size: 11.5pt; margin-top: 10pt; }}
+  table {{ border-collapse: collapse; width: 100%; font-size: 9pt; margin: 6pt 0; page-break-inside: avoid; }}
+  th, td {{ border: 1px solid #bbb; padding: 3px 5px; text-align: right; }}
+  th {{ background: #eee; }}
+  td:first-child, th:first-child {{ text-align: left; }}
+  code {{ font-family: Consolas, monospace; font-size: 8.5pt; background: #f4f4f4; padding: 0 2px; }}
+  pre {{ background: #f4f4f4; padding: 6px; font-size: 8pt; overflow-x: auto; }}
+  .meta {{ color: #444; font-size: 9.5pt; }}
+  img {{ max-width: 100%; }}
+  .fig {{ text-align: center; margin: 8pt 0; page-break-inside: avoid; }}
+  .fig img {{ max-width: 86%; }}
+  .figcap {{ font-size: 8.5pt; color: #555; }}
+</style></head><body>
+
+<h1>Atlas Vivo — Informe académico de reproducibilidad</h1>
+<p class="meta">Estimación académica del valor del suelo rural de Yacopí, Cundinamarca ·
+Rama <code>experimental/valor-terreno-ha</code> (commit <code>{COMMIT}</code>) ·
+generado el {FECHA} · Complemento de los cuadernos (no los sustituye)</p>
+
+<h2>1. Problema y observaciones del director</h2>
+<p>El profesor director requirió: (i) los cuadernos de análisis; (ii) trazabilidad de
+datos y decisiones; (iii) el código real de los algoritmos; (iv) aclarar qué se
+predijo en cada experimento pese a las dudas sobre la variable de respuesta; y
+(v) explicar los R² negativos y bajos del software. Este informe responde con
+evidencia reproducible, sin presentar un nuevo modelo definitivo.</p>
+
+<h2>2. Fuentes</h2>
+<p><code>data/raw/interseccion_terrenos_zhg_r1_yacopi.csv</code> (9.447 filas × 17 columnas;
+avalúo, áreas, zonas ZHG) y <code>data/raw/zhf_yacopi.csv</code> (7.968 × 28; ZHF, CLC,
+coordenadas). Hashes SHA-256 y procedencia en <code>data/raw/data_manifest.json</code>.
+Fecha y vigencia de avalúos: no documentadas (pendiente con el docente).</p>
+
+<h2>3. Preparación de datos</h2>
+<p>Normalización de nombres y códigos → deduplicación (3 filas idénticas de
+intersecciones; 47 sobrantes ZHF) → unión por predio (7.694 con coincidencia;
+15 solo intersección; 227 solo ZHF) → consolidación 1 fila/predio
+(<b>7.709 predios</b>) → banderas de calidad (1.601 multizona; 4.924 con
+|ZHF−catastral|&gt;5 %; 46 áreas ≤100 m²; 3.033 con construcción). Código:
+<code>scripts/preparar_datos.py</code>, <code>scripts/build_db.py</code>,
+<code>scripts/audit_data.py</code>.</p>
+
+<h2>4. Variables objetivo de cada experimento</h2>
+<table>
+<tr><th>Experimento</th><th>Y</th><th>Construcción</th><th>n</th><th>Estado</th></tr>
+<tr><td>exp-proxy-001 (Fase 2)</td><td>avalúo catastral TOTAL/ha (incluye obra)</td><td>proxy</td><td>7.694</td><td>histórico</td></tr>
+<tr><td>exp-zhg-001 (Fase 5)</td><td>referencia ZHG zonal (11 valores)</td><td>solo zonas conocidas</td><td>7.709</td><td>rechazado</td></tr>
+<tr><td>exp-zhg-001-ponderado</td><td>valor zonal ponderado (651 valores)</td><td>ídem</td><td>2.785</td><td>rechazado</td></tr>
+<tr><td>exp-zhg-001-demo</td><td>referencia ZHG (sin evaluación independiente)</td><td>ajuste a todos</td><td>7.709</td><td>demo off</td></tr>
+<tr><td>exp-valor-terreno-001 A</td><td>VALOR_AVALUO×10000/AREA_TERRENO (COP/ha)</td><td>construcción = 0</td><td>4.676</td><td>experimental</td></tr>
+<tr><td>exp-valor-terreno-001 B</td><td>ídem</td><td>0 &lt; construcción ≤ 32 m²</td><td>986</td><td>experimental</td></tr>
+<tr><td>Oficial</td><td>valor exclusivo de suelo validado</td><td>—</td><td>—</td><td>503 pendiente</td></tr>
+</table>
+
+<h2>5. Construcción de modelos (código representativo)</h2>
+<p>Archivos reales: <code>ml/src/yacopi_ml/models.py</code> (Fase 2) y
+<code>ml/src/yacopi_ml/valor/train.py</code> (rama experimental).</p>
+<pre>forest = Pipeline([
+    ("preprocess", preprocesador(X_train)),      # imputación + estandarización + one-hot
+    ("model", RandomForestRegressor(n_estimators=400, max_depth=18,
+                                    min_samples_leaf=3, random_state=SEED)),
+])
+forest.fit(X_train, y_train)
+pred = forest.predict(X_test)                    # métricas con sklearn.metrics
+</pre>
+<p>Ridge entrena sobre <code>log1p(y)</code> y predice con <code>expm1</code>;
+CatBoost usa <code>cat_features</code> nativos (1.000 iteraciones, depth 6, lr 0,05).
+Transformaciones ajustadas SOLO con entrenamiento. Semillas: 42 (Fase 2/5) y
+20261023 (rama experimental).</p>
+
+<h2>6. Métricas (protocolo v2: validaciones independientes)</h2>
+<p>Corrección de esta revisión: antes los modelos se entrenaban con la
+partición aleatoria y se evaluaban sobre el test espacial (81 % del test
+espacial de A y 80 % del de B ya estaban en el entrenamiento). Ahora cada
+protocolo entrena con su propio conjunto. Las cifras espaciales anteriores
+quedan archivadas como históricas no independientes.</p>
+<h3>VALOR_TERRENO_Ha (test por predio / test espacial independiente)</h3>
+<table><tr><th>Escenario</th><th>Modelo</th><th>R² predio</th><th>R² espacial</th><th>MAE predio</th><th>MAE espacial</th></tr>
+{tabla_valor('A')}</table>
+<table><tr><th>Escenario</th><th>Modelo</th><th>R² predio</th><th>R² espacial</th><th>MAE predio</th><th>MAE espacial</th></tr>
+{tabla_valor('B')}</table>
+<h3>ZHG Fase 5 (R² por predio vs zonas completas fuera)</h3>
+<table><tr><th>Modelo</th><th>R² predio</th><th>R² zonas fuera</th><th>MAE predio</th><th>MAE zonas fuera</th></tr>
+{filas_zhg('dummy')}{filas_zhg('ridge')}{filas_zhg('tree')}{filas_zhg('forest')}{filas_zhg('catboost')}</table>
+
+<h3>Comparación espacial del escenario A sobre los mismos 689 predios</h3>
+<table><tr><th>Referencia</th><th>MAE (COP/ha)</th><th>MdAPE</th></tr>
+<tr><td>Random Forest</td><td>767.064</td><td>11,69 %</td></tr>
+<tr><td>Referencia ZHG del dataset</td><td>817.030</td><td><b>5,65 %</b></td></tr>
+<tr><td>CatBoost</td><td>897.642</td><td>25,64 %</td></tr></table>
+<p>El menor MAE no implica el menor MdAPE: el MAE es sensible a pocos errores
+absolutos grandes; el MdAPE (mediana del error relativo) es robusto a ellos.
+RF gana el MAE (−6 % frente a la referencia ZHG) pero pierde el MdAPE
+(11,69 % vs 5,65 %): su mejora sobre el dato zonal es <b>limitada</b>.</p>
+<p>Escenario B: los 7 valores extremos (&gt; 50 M COP/ha por áreas mínimas)
+caen en el test por predios y no en el test espacial; por eso el protocolo
+predio muestra MAE ≈ 11,5–15,3 M y R² 0,12–0,15, mientras el espacial
+independiente alcanza MAE 0,93 M (RF) y R² 0,86. Son conjuntos de prueba con
+composición distinta: ambos se reportan.</p>
+
+<h2>7. Explicación de los R² negativos y bajos</h2>
+<p>R² = 1 − Σ(y−ŷ)² / Σ(y−ȳ)². R² &lt; 0 ⇒ el modelo supera en error cuadrático a la
+media del conjunto evaluado; no es un porcentaje de aciertos. Casos reales:</p>
+<ul>
+<li><b>Baselines</b> (proxy −0,03/−0,02; dummy ≈ 0): la referencia media/mediana
+sobre un test distinto del entrenamiento da R² ≈ 0 por construcción.</li>
+<li><b>Ridge espacial −0,11 (proxy):</b> modelo lineal sobre objetivo sesgado, peor
+que la media en bloques geográficos nuevos.</li>
+<li><b>ZHG zonas fuera −1,70 (RF) y −2,18 (CatBoost):</b> zonas 01/06/10 nunca
+vistas, con niveles propios; el modelo memoriza la zona y no extrapola.</li>
+<li><b>LOZO −1e30/NaN:</b> subconjuntos con varianza casi nula → denominador ≈ 0
+(R² indefinido).</li>
+<li><b>Escenario B (R² 0,12–0,15):</b> 7 predios de test &gt; 50 M COP/ha por
+áreas mínimas dominan el error cuadrático.</li>
+<li><b>v2 espacial A (CatBoost −0,075):</b> bloques geográficos no vistos en el
+entrenamiento (generalización espacial limitada).</li>
+</ul>
+<p>Recálculo: <code>ml/src/yacopi_ml/valor/audit_r2.py</code> (sklearn
+<code>r2_score</code> sobre pares alineados y_true/y_pred) con protocolos
+independientes y asserts de disjuntez. Además, hoy se reentrenó por completo
+el experimento proxy y el ZHG: reproducen exactamente las cifras históricas
+de la interfaz y de Fase 5 (negativos incluidos). <b>El único defecto de
+evaluación identificado fue la validación espacial v1</b> (test contaminado,
+métricas infladas —no negativas—, corregidas y archivadas como no
+independientes). Los R² negativos reportados están calculados correctamente
+y responden a causas científicas, no a errores de programación.</p>
+<p>Ejemplo didáctico corregido (figura 1): recta ajustada en x ∈ [0,2] de una
+parábola y evaluada en x ∈ [6,10] con entrenamiento y prueba separados →
+R² prueba = −18,55 (calculado por el código).</p>
+<div class="fig"><img src="figuras/fig00_ejemplo_r2_negativo.png">
+<div class="figcap">Figura 1 — R² negativo sin error de código: recta ajustada a una
+parábola (entrenamiento en x ∈ [0,2], prueba en x ∈ [6,10]; R² de prueba =
+−18,55).</div></div>
+
+<h2>8. Comparación por tipo de validación</h2>
+<p>La partición aleatoria infla R² por autocorrelación espacial (proxy RF:
+0,82 → 0,74 al pasar a espacial; valor-terreno A RF: 0,69 → <b>0,17</b> en la
+validación espacial independiente). Con zonas completas fuera, los modelos
+ZHG colapsan (R² negativos) → rechazo con criterio predefinido. LOZO del
+escenario A: MAE 175 k–1,19 M por zona: el desempeño depende de que la zona
+esté representada.</p>
+
+<h2>9. Decisiones tomadas</h2>
+<ul>
+<li>No entrenar modelo "oficial" sin etiqueta verificada (503).</li>
+<li>Proxy histórico solo como comparación metodológica, nunca elegible.</li>
+<li>Fase 5: criterio de aceptación predefinido → rechazo de los 5 modelos.</li>
+<li>Demo RF desactivada por defecto y distinguida de validación.</li>
+<li>Nueva variable del profesor auditada antes de modelar; umbral de 32 m²
+verificado sobre CONSTRUCCIÓN; extremos reportados sin eliminarlos.</li>
+<li><b>Corrección de esta revisión:</b> validación espacial con entrenamiento
+propio (protocolo v2); métricas v1 archivadas como no independientes.</li>
+</ul>
+
+<h2>10. Limitaciones metodológicas</h2>
+<ul>
+<li>Sin fecha/vigencia del avalúo ni del valor zonal.</li>
+<li><code>valor_avaluo</code> es total (incluye construcción); no hay campo de
+suelo exclusivo.</li>
+<li>Áreas inconsistentes entre fuentes (4.924 predios &gt; 5 %).</li>
+<li>Dependencia espacial fuerte; extremos por áreas mínimas sin criterio
+docente.</li>
+<li>Métricas ZHG de Fase 5 y proxy: verificadas hoy por reentrenamiento
+completo (reproducción exacta); la variante ponderada no se reentrenó.</li>
+<li>Consolidación: avalúo/áreas constantes por predio (0 inconsistentes);
+12 predios (0,16 %) con zona dominante distinta de la primera registrada
+(corregido usando la zona dominante por área); sin crossover entre
+escenarios A y B.</li>
+</ul>
+
+<h2>11. Preguntas al docente</h2>
+<ol>
+<li>Fecha y procedencia de <code>valor_avaluo</code>.</li>
+<li>¿Avalúo total o exclusivo de terreno?</li>
+<li>Confirmación del umbral de 32 m² sobre construcción.</li>
+<li>Criterio para predios con área mínima (cocientes extremos).</li>
+<li>Alcance interpretativo: ¿refinar la referencia zonal o fuente independiente?</li>
+</ol>
+
+<h2>12. Próximos pasos</h2>
+<p>Con las confirmaciones docentes: consolidar el escenario A (CatBoost/RF) como
+candidato experimental, definir el tratamiento de extremos, documentar el
+esquema de entrada FastAPI y solo entonces evaluar la habilitación del
+endpoint oficial (hoy 503).</p>
+
+</body></html>
+"""
+
+OUT.write_text(html, encoding="utf-8")
+print("HTML generado:", OUT)

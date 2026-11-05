@@ -1,0 +1,179 @@
+{
+  "proyecto": "Atlas Vivo — entrega docente de reproducibilidad",
+  "generado_el": "2026-11-05T04:02:57.804214+00:00",
+  "commit": "b3b0b380bb92d4603c11f893838b566dc6ced87e",
+  "rama": "experimental/valor-terreno-ha",
+  "entradas": {
+    "interseccion_terrenos_zhg_r1_yacopi.csv": "8402f527a5468f94a80753b547f54c64ee96e4a938bc2afe4d119b488a3d6875",
+    "zhf_yacopi.csv": "9bd88923146530ade9ba9eb964d8e97aee32e28ce56e4b95b08e380b684e15ad"
+  },
+  "entornos": {
+    "python": "3.14.4",
+    "sistema": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "scikit_learn": "1.9.1",
+    "catboost": "n/d"
+  },
+  "semillas": {
+    "proxy_fase2": 42,
+    "zhg_fase5": 42,
+    "valor_terreno_rama_experimental": 20261023
+  },
+  "particiones": {
+    "proxy": "data/splits/{train,test}_{random,spatial}.json",
+    "zhg": "data/splits/zhg/<objetivo>_n<size>/",
+    "valor": "data/splits/valor/valor_terreno_ha_{A|B}_n<size>/",
+    "valor_hashes": {
+      "data/splits/valor/valor_terreno_ha_A_n4676/test_espacial.json": "83b983f42f66e4de1ec0a414e5fe1e2c973e13c5917f223e924aa9a2e27844e6",
+      "data/splits/valor/valor_terreno_ha_A_n4676/test_predio.json": "a92546aac22568ca301e96d9caca1a988ebbe397a72235bd377b23d00aa94684",
+      "data/splits/valor/valor_terreno_ha_A_n4676/train_espacial.json": "8a7765447e90f41c85ede4bb26f9c653219cfd80bb1df99fc99c82ea21a9027f",
+      "data/splits/valor/valor_terreno_ha_A_n4676/train_predio.json": "475df6a515176942c478948880cf3765fef0c20902cfdbfc8ee722a2c2f95da3",
+      "data/splits/valor/valor_terreno_ha_B_n986/test_espacial.json": "858872dfc8425bb1aa554f3f8b901a71f23b410fa6c8e7e3061d0967a51de12b",
+      "data/splits/valor/valor_terreno_ha_B_n986/test_predio.json": "b693057d4d3beee98cf89325014edcba402952e267e09110838bf2e24ab675ed",
+      "data/splits/valor/valor_terreno_ha_B_n986/train_espacial.json": "b667421e9bf203176a09f4a49d748c2a50f69f7b38f03ddc174a664b5282b97d",
+      "data/splits/valor/valor_terreno_ha_B_n986/train_predio.json": "ed7fd918a13ec0e6c6a906f7ee7d84ac7e41dc82929d79495abc12208c259203"
+    }
+  },
+  "resultados_clave": {
+    "valor_terreno_A": {
+      "protocolo": "v2_independiente",
+      "n_predios": 4676,
+      "protocolo_predio": {
+        "n_train": 3740,
+        "n_test": 936,
+        "metricas": {
+          "dummy_media": {
+            "mae_cop_ha": 758752.255637516,
+            "r2": -0.000304899570688244
+          },
+          "arbol": {
+            "mae_cop_ha": 343025.3977021171,
+            "r2": 0.4590991994387982
+          },
+          "random_forest": {
+            "mae_cop_ha": 248296.24252911794,
+            "r2": 0.6893416029558046
+          },
+          "ridge_log": {
+            "mae_cop_ha": 392022.18066114647,
+            "r2": 0.30215221250067303
+          },
+          "catboost": {
+            "mae_cop_ha": 279283.8985443448,
+            "r2": 0.7254182567559111
+          }
+        }
+      },
+      "protocolo_espacial": {
+        "n_train": 3987,
+        "n_test": 689,
+        "metricas": {
+          "dummy_media": {
+            "mae_cop_ha": 1237010.6445719847,
+            "r2": -0.0056502026519997806
+          },
+          "arbol": {
+            "mae_cop_ha": 805689.9847624671,
+            "r2": 0.09242994451975628
+          },
+          "random_forest": {
+            "mae_cop_ha": 767064.075904621,
+            "r2": 0.17102958966752746
+          },
+          "ridge_log": {
+            "mae_cop_ha": 838995.8077073463,
+            "r2": 0.010997912760004613
+          },
+          "catboost": {
+            "mae_cop_ha": 897642.4671803563,
+            "r2": -0.07489169999942624
+          }
+        }
+      }
+    },
+    "valor_terreno_B": {
+      "protocolo": "v2_independiente",
+      "n_predios": 986,
+      "protocolo_predio": {
+        "n_train": 788,
+        "n_test": 198,
+        "metricas": {
+          "dummy_media": {
+            "mae_cop_ha": 15347647.238955874,
+            "r2": -0.014977793262090922
+          },
+          "arbol": {
+            "mae_cop_ha": 11846089.838024655,
+            "r2": 0.11787867894939641
+          },
+          "random_forest": {
+            "mae_cop_ha": 11487893.66927922,
+            "r2": 0.14599163428234374
+          },
+          "ridge_log": {
+            "mae_cop_ha": 12726824.732970048,
+            "r2": 0.045558713468330514
+          },
+          "catboost": {
+            "mae_cop_ha": 11670499.45192981,
+            "r2": 0.11811411206957967
+          }
+        }
+      },
+      "protocolo_espacial": {
+        "n_train": 809,
+        "n_test": 177,
+        "metricas": {
+          "dummy_media": {
+            "mae_cop_ha": 6175772.134750237,
+            "r2": -0.086928786181514
+          },
+          "arbol": {
+            "mae_cop_ha": 1149744.236712147,
+            "r2": 0.6176962926649572
+          },
+          "random_forest": {
+            "mae_cop_ha": 932873.4062416257,
+            "r2": 0.8627550379243601
+          },
+          "ridge_log": {
+            "mae_cop_ha": 2229864.1665462404,
+            "r2": 0.22440237804874275
+          },
+          "catboost": {
+            "mae_cop_ha": 1777243.4049928142,
+            "r2": 0.6463812634906619
+          }
+        }
+      }
+    },
+    "zhg_fase5": {
+      "target": "valor_zona_dominante_cop_ha",
+      "n_predios": 7709,
+      "criterio_aceptacion": {
+        "definicion": "MAE < mediana en test predio y espacial, y MAE < moda zonal en test con zonas fuera (criterio predefinido antes de ver resultados)",
+        "beats_median": true,
+        "beats_mode": false,
+        "aceptado": false
+      },
+      "r2_zona_fuera": {
+        "dummy": -0.1858,
+        "ridge": -0.3212,
+        "tree": -0.1723,
+        "forest": -1.704,
+        "catboost": -2.1777
+      },
+      "nota_integridad": "verificado por reentrenamiento completo (exp-zhg-rerun): las particiones congeladas actuales reproducen EXACTAMENTE las metricas historicas de Fase 5 (R2 zona fuera incluidos). La variante ponderada no se reentreno en esta entrega."
+    }
+  },
+  "pruebas": {
+    "pytest_backend_ml": "96 tests (ultima corrida documentada)",
+    "vitest_frontend": "33 tests (ultima corrida documentada)"
+  },
+  "limitaciones": [
+    "CSV originales no incluidos en el paquete (privados).",
+    "Variante ZHG ponderada no reentrenada en esta entrega (metricas de su metrics.json).",
+    "La demo RF no tiene evaluacion independiente por diseno."
+  ]
+}
