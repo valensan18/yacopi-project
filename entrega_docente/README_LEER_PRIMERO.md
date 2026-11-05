@@ -29,13 +29,12 @@ Yacopí (Cundinamarca). Sitio público: https://atlasvivo.xyz
 10. `GUIA_REPRODUCIBILIDAD.md` — cómo ejecutar todo desde cero.
 11. `PREGUNTAS_PARA_EL_PROFESOR.md` — decisiones metodológicas pendientes de
     confirmación docente.
-12. `GUION_EXPOSICION_10MIN.md` — guion técnico de 10–15 minutos.
-13. `ATLAS_VIVO_INFORME_ACADEMICO.pdf` — resumen académico con código y
+12. `ATLAS_VIVO_INFORME_ACADEMICO.pdf` — resumen académico con código y
     métricas.
-14. `notebooks/` — 13 cuadernos de reproducción **ejecutados** (nuevos,
+13. `notebooks/` — 13 cuadernos de reproducción **ejecutados** (nuevos,
     identificados como posteriores; los cuadernos originales no existían).
-15. `figuras/` — 11 gráficas generadas por código reproducible.
-16. `manifiesto_reproducibilidad.json` — commit, hashes de entradas,
+14. `figuras/` — 11 gráficas generadas por código reproducible.
+15. `manifiesto_reproducibilidad.json` — commit, hashes de entradas,
     versiones, semillas y resultados.
 
 ## Aviso de privacidad

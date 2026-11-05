@@ -38,7 +38,6 @@ B (0 < construcción ≤ 32 m²; 986 predios).
 | `entrega_docente/RESULTADOS_Y_LIMITACIONES.md` | Qué es válido y en qué alcance |
 | `entrega_docente/GUIA_REPRODUCIBILIDAD.md` | Cómo ejecutar todo desde cero |
 | `entrega_docente/PREGUNTAS_PARA_EL_PROFESOR.md` | Decisiones pendientes de confirmación docente |
-| `entrega_docente/GUION_EXPOSICION_10MIN.md` | Guion de exposición técnica |
 | `entrega_docente/ATLAS_VIVO_INFORME_ACADEMICO.pdf` | Resumen académico con código y métricas |
 | `entrega_docente/manifiesto_reproducibilidad.json` | Commit, hashes de entrada, versiones, semillas y resultados |
 | `entrega_docente/notebooks/` | 13 cuadernos ejecutados (ver orden abajo) |
