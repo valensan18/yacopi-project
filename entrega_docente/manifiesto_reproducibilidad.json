@@ -1,8 +1,8 @@
 {
   "proyecto": "Atlas Vivo — entrega docente de reproducibilidad",
-  "generado_el": "2026-11-05T04:02:57.804214+00:00",
-  "commit": "b3b0b380bb92d4603c11f893838b566dc6ced87e",
-  "rama": "experimental/valor-terreno-ha",
+  "generado_el": "2026-11-05T04:27:28.320260+00:00",
+  "commit": "5cfabd6e0791355b4b94399c137d8ba01896b3e5",
+  "rama": "revision-docente/valor-terreno-v2",
   "entradas": {
     "interseccion_terrenos_zhg_r1_yacopi.csv": "8402f527a5468f94a80753b547f54c64ee96e4a938bc2afe4d119b488a3d6875",
     "zhf_yacopi.csv": "9bd88923146530ade9ba9eb964d8e97aee32e28ce56e4b95b08e380b684e15ad"
@@ -24,16 +24,7 @@
     "proxy": "data/splits/{train,test}_{random,spatial}.json",
     "zhg": "data/splits/zhg/<objetivo>_n<size>/",
     "valor": "data/splits/valor/valor_terreno_ha_{A|B}_n<size>/",
-    "valor_hashes": {
-      "data/splits/valor/valor_terreno_ha_A_n4676/test_espacial.json": "83b983f42f66e4de1ec0a414e5fe1e2c973e13c5917f223e924aa9a2e27844e6",
-      "data/splits/valor/valor_terreno_ha_A_n4676/test_predio.json": "a92546aac22568ca301e96d9caca1a988ebbe397a72235bd377b23d00aa94684",
-      "data/splits/valor/valor_terreno_ha_A_n4676/train_espacial.json": "8a7765447e90f41c85ede4bb26f9c653219cfd80bb1df99fc99c82ea21a9027f",
-      "data/splits/valor/valor_terreno_ha_A_n4676/train_predio.json": "475df6a515176942c478948880cf3765fef0c20902cfdbfc8ee722a2c2f95da3",
-      "data/splits/valor/valor_terreno_ha_B_n986/test_espacial.json": "858872dfc8425bb1aa554f3f8b901a71f23b410fa6c8e7e3061d0967a51de12b",
-      "data/splits/valor/valor_terreno_ha_B_n986/test_predio.json": "b693057d4d3beee98cf89325014edcba402952e267e09110838bf2e24ab675ed",
-      "data/splits/valor/valor_terreno_ha_B_n986/train_espacial.json": "b667421e9bf203176a09f4a49d748c2a50f69f7b38f03ddc174a664b5282b97d",
-      "data/splits/valor/valor_terreno_ha_B_n986/train_predio.json": "ed7fd918a13ec0e6c6a906f7ee7d84ac7e41dc82929d79495abc12208c259203"
-    }
+    "valor_hashes": {}
   },
   "resultados_clave": {
     "valor_terreno_A": {
