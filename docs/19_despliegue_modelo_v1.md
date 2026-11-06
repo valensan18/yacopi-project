@@ -54,6 +54,46 @@ curl -s -o /dev/null -w "%{http_code}" -X POST https://atlasvivo.xyz/api/v1/pred
 
 ## 2. Habilitación de la demostración (solo tras revisión del informe)
 
+### 2.0 Rate limiting en el Nginx del host (BLOQUEANTE: sin esto NO activar)
+
+Antes de poner `VALOR_V1_ENABLED=true`, añadir en la VPS
+(`/etc/nginx/nginx.conf`, dentro del bloque `http {}`):
+
+```nginx
+# Limite por IP para el endpoint de la demostración RF v1
+limit_req_zone $binary_remote_addr zone=atlas_valor_v1:10m rate=10r/m;
+```
+
+Y en el `server {}` de atlasvivo.xyz (antes del `location /` genérico):
+
+```nginx
+location = /api/v1/predictions/valor-terreno-v1 {
+    limit_req zone=atlas_valor_v1 burst=5 nodelay;
+    proxy_pass http://127.0.0.1:8080;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Verificar configuración y recargar SIN cortar el servicio:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+# Comprobación del límite (con la demo aun desactivada debe dar 503 de la APP):
+for i in $(seq 1 12); do
+  curl -s -o /dev/null -w "%{http_code}\n" \
+    -X POST https://atlasvivo.xyz/api/v1/predictions/valor-terreno-v1 \
+    -H "Content-Type: application/json" -d '{"public_id":"p_6049c425ce3cf79d"}'
+done
+# esperado: todas 503 VALOR_V1_DISABLED; si Nginx limitara, devolvería 503
+# "Service Temporarily Unavailable" en las peticiones que excedan 10/min.
+```
+
+### 2.1 Activar la demostración
+
 ```bash
 cd /home/atlasadmin/atlas
 # Añadir a .env (NO commitear):
@@ -79,6 +119,10 @@ valores separados (referencia ZHG vs estimación RF) y las métricas reales.
 
 ```bash
 cd /home/atlasadmin/atlas
+
+# 3.0 Quitar el rate limiting si se revierte la funcionalidad
+#   (eliminar el location y limit_req_zone agregados en nginx.conf)
+#   sudo nginx -t && sudo systemctl reload nginx
 
 # 3.1 Rollback de la aplicación (imágenes anteriores)
 docker image tag atlas-backend-rollback:<FECHA>  <nombre-imagen-backend-actual>
