@@ -65,13 +65,12 @@ describe('ATLAS VIVO — portada (Fase 4)', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('ATLAS')
   })
 
-  it('muestra el banner de modelo pendiente de validación', async () => {
+  it('no muestra el banner de modelo pendiente de validación (retirado)', async () => {
     renderApp()
     await waitFor(() => {
-      expect(screen.getByRole('status').textContent).toContain(
-        'Modelo predictivo pendiente de validación',
-      )
+      expect(screen.getAllByText(/ATLAS VIVO/).length).toBeGreaterThan(0)
     })
+    expect(screen.queryByText(/Modelo predictivo pendiente de validación/)).not.toBeInTheDocument()
   })
 
   it('usa el fallback 2D cuando no hay WebGL', async () => {

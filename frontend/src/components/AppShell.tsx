@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import SystemStatusBanner from './SystemStatusBanner'
 import { APP_DESCRIPTION_CORTA } from '../lib/appContent'
 import styles from './AppShell.module.css'
 
@@ -98,8 +97,6 @@ export default function AppShell() {
           </motion.nav>
         )}
       </AnimatePresence>
-
-      <SystemStatusBanner />
 
       <main id="contenido">
         <Outlet />
