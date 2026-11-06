@@ -33,8 +33,10 @@
    evaluación + limitaciones + disclaimer (sin IDs privados ni avalúos)
         ▼
 7. INTERFAZ (/prediccion — frontend/src/pages/Prediction.tsx)
-   Sección "Estimación con Machine Learning — Demostración académica"
-   A. Referencia ZHG (dato)  |  B. Estimación Random Forest (predicción)
+   Página "Estimación catastral con inteligencia artificial" · botón
+   "Consultar estimación"
+   Estimación RF (valor principal)  |  Referencia ZHG (dato territorial,
+   bloque separado)  |  diferencia absoluta y porcentual
 ```
 
 ## Puntos de control de seguridad en el flujo

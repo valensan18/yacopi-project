@@ -22,26 +22,43 @@ const statusFixture = {
   public_notice: 'Información académica',
 }
 
-const demoFixture = {
+const valorV1Fixture = {
   public_id: 'p_abc123',
-  model_id: 'exp-zhg-001-demo',
-  model_status: 'experimental',
+  model_id: 'atlas-vivo-rf-v1',
+  model_version: '1.0.0',
+  model_role: 'demostracion_academica',
+  target: 'VALOR_TERRENO_Ha',
+  target_description: 'valor catastral unitario derivado del avalúo total',
   unit: 'COP/ha',
-  target_description: 'valor unitario de referencia ZHG del suelo rural',
+  predicted_cop_ha: 505000,
   reference_zhg_cop_ha: 456041.7,
-  predicted_zhg_cop_ha: 452000.0,
-  absolute_difference_cop_ha: -4041.7,
-  relative_difference_pct: -0.89,
+  reference_zhg_note: 'Referencia geoeconómica ZHG consultada de los datos',
+  absolute_difference_vs_zhg_cop_ha: 48958.3,
+  relative_difference_vs_zhg_pct: 10.74,
   zone_code: '07',
-  domain_status: 'in_domain',
-  source_description: 'valor_hectarea_agropecuario = ZHG_VALOR_ por zona',
+  applicability_status: 'admitted',
+  applicability_conditions: ['Predio sin construcción registrada (escenario A).'],
+  evaluation_context: {
+    test_sellado_v2_espacial: {
+      n: 689,
+      rf: { mae_cop_ha: 767064.08, mdape: 0.1169, r2: 0.171 },
+      referencia_zhg: { mae_cop_ha: 817030.0, mdape: 0.0565 },
+    },
+    estabilidad_5_pliegues_espaciales: {
+      rf_gana_mae_en: 0,
+      rf_gana_mdape_en: 0,
+      rf_mae_mediana: 259000,
+      zhg_mae_mediana: 197000,
+      rf_mdape_mediana: 0.2,
+      zhg_mdape_mediana: 0.054,
+    },
+  },
   reference_date: null,
   limitations: [
-    'Demostración experimental de aprendizaje automático. Su resultado no constituye un avalúo individual certificado ni reemplaza la referencia ZHG.',
+    'Demostración académica: el modelo no superó a la referencia ZHG en MAE ni MdAPE.',
+    'No existe todavía un modelo definitivo aprobado.',
   ],
-  evaluation_context: { split_membership: { predio: 'train' } },
-  disclaimer:
-    'Demostración experimental de aprendizaje automático. Su resultado no constituye un avalúo individual certificado ni reemplaza la referencia ZHG.',
+  disclaimer: 'Estimación orientativa de valor catastral unitario. No constituye un avalúo.',
 }
 
 const overviewFixture = {
@@ -152,16 +169,18 @@ function mockFetch(routes: Record<string, unknown>) {
       // prefiero la coincidencia más específica (sufijo exacto de la URL)
       for (const [needle, payload] of ordered) {
         if (url.endsWith(needle)) {
+          const esError = (payload as { error?: unknown }).error != null
           return new Response(JSON.stringify(payload), {
-            status: 200,
+            status: esError ? 422 : 200,
             headers: { 'Content-Type': 'application/json' },
           })
         }
       }
       for (const [needle, payload] of ordered) {
         if (url.includes(needle)) {
+          const esError = (payload as { error?: unknown }).error != null
           return new Response(JSON.stringify(payload), {
-            status: 200,
+            status: esError ? 422 : 200,
             headers: { 'Content-Type': 'application/json' },
           })
         }
@@ -239,92 +258,79 @@ describe('Pantalla Modelos', () => {
 })
 
 describe('Pantalla Predicción', () => {
-  it('muestra bloqueo oficial y oculta el bloque proxy desactivado', async () => {
+  it('muestra el modelo desactivado cuando el flag está apagado, sin apartados antiguos', async () => {
     mockFetch({ '/system/status': statusFixture })
     renderAt('/prediccion', <Prediction />)
     await waitFor(() => {
-      expect(screen.getByText(/503 MODEL_NOT_READY/)).toBeInTheDocument()
+      expect(screen.getByText('VALOR_V1_ENABLED=false')).toBeInTheDocument()
     })
-    expect(screen.queryByText(/Predicción experimental: desactivada/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/Predicción experimental \(proxy\)/)).not.toBeInTheDocument()
-    expect(screen.getByText('Comprobar estado oficial (real)')).toBeInTheDocument()
-  })
-
-  it('consulta la referencia ZHG de un predio sin presentarla como predicción', async () => {
-    mockFetch({
-      '/system/status': statusFixture,
-      '/zhg-reference': zhgReferenceFixture,
-      '/properties': parcelsFixture,
-    })
-    renderAt('/prediccion', <Prediction />)
-    await waitFor(() => {
-      expect(
-        screen.getByText(/Consulta de referencia de valor \(no es predicción\)/),
-      ).toBeInTheDocument()
-    })
-    const input = screen.getByRole('combobox', { name: 'Identificador público del predio' })
-    await userEvent.type(input, 'p_ab')
-    await waitFor(() => {
-      expect(screen.getByRole('option', { name: /p_abc123/ })).toBeInTheDocument()
-    })
-    await userEvent.click(screen.getByRole('option', { name: /p_abc123/ }))
-    await userEvent.click(screen.getByRole('button', { name: /Consultar referencia ZHG/ }))
-    await waitFor(() => {
-      expect(screen.getByText('Valor unitario de referencia del suelo')).toBeInTheDocument()
-    })
-    expect(screen.getByText('dato · no predicción')).toBeInTheDocument()
-    expect(screen.getByText(/Avalúo oficial · no emitido/)).toBeInTheDocument()
-  })
-
-  it('muestra la demostración ML desactivada cuando el flag está apagado', async () => {
-    mockFetch({ '/system/status': statusFixture })
-    renderAt('/prediccion', <Prediction />)
-    await waitFor(() => {
-      expect(screen.getByText(/Demostración experimental \(zonas conocidas\)/)).toBeInTheDocument()
-    })
-    expect(screen.getAllByText(/desactivada en este entorno/).length).toBeGreaterThanOrEqual(2)
-    expect(screen.getByText(/Estimación con Machine Learning — Demostración académica/)).toBeInTheDocument()
+    expect(screen.getByText('Estimación catastral con inteligencia artificial')).toBeInTheDocument()
+    expect(screen.getByText(/no está habilitado en este entorno/)).toBeInTheDocument()
+    expect(screen.queryByText(/503 MODEL_NOT_READY/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Consulta de referencia de valor/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Demostración experimental \(zonas conocidas\)/)).not.toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: /Ejecutar demostración experimental/ }),
-    ).not.toBeInTheDocument()
+      screen.queryByRole('button', { name: /Consultar estimación/ }),
+    ).toBeDisabled()
   })
 
-  it('ejecuta la demostración ML cuando el flag está activo', async () => {
+  it('consulta una estimación real cuando el modelo está activo', async () => {
     mockFetch({
       '/system/status': {
         ...statusFixture,
-        experimental_zhg: { habilitado: true, disponible: true },
+        valor_v1: { habilitado: true, disponible: true, model_id: 'atlas-vivo-rf-v1', model_version: '1.0.0' },
       },
-      '/predictions/experimental-zhg': demoFixture,
+      '/predictions/valor-terreno-v1': valorV1Fixture,
       '/properties': parcelsFixture,
     })
     renderAt('/prediccion', <Prediction />)
     await waitFor(() => {
-      expect(
-        screen.getByText(/Demostración experimental \(zonas conocidas\)/),
-      ).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Consultar estimación/ })).toBeEnabled()
     })
-    const comboboxes = screen.getAllByRole('combobox', {
-      name: 'Identificador público del predio',
-    })
-    await userEvent.type(comboboxes[comboboxes.length - 1], 'p_ab')
+    const input = screen.getByRole('combobox', { name: 'Identificador público del predio' })
+    await userEvent.type(input, 'p_ab')
     const option = await screen.findByRole('option', { name: /p_abc123/ })
     await userEvent.click(option)
-    await userEvent.click(
-      screen.getByRole('button', { name: /Ejecutar demostración experimental/ }),
-    )
+    await userEvent.click(screen.getByRole('button', { name: /Consultar estimación/ }))
     await waitFor(() => {
-      expect(screen.getByText('Referencia ZHG conocida')).toBeInTheDocument()
+      expect(screen.getByText(/505\.000 COP\/ha/)).toBeInTheDocument()
     })
-    expect(screen.getByText('Estimación experimental')).toBeInTheDocument()
-    expect(screen.getByText('Diferencia')).toBeInTheDocument()
-    expect(screen.getAllByText(/COP\/ha/).length).toBeGreaterThan(0)
-    expect(
-      screen.getByText(/dentro de los rangos y categorías admitidos/),
-    ).toBeInTheDocument()
-    expect(screen.getByText(/participó en el ajuste del modelo experimental/)).toBeInTheDocument()
-    expect(screen.getByText('¿Qué significa este resultado para el predio?')).toBeInTheDocument()
-    expect(screen.getByText('Ver todas las limitaciones')).toBeInTheDocument()
+    expect(screen.getByText(/atlas-vivo-rf-v1/)).toBeInTheDocument()
+    expect(screen.getByText('Referencia ZHG (dato territorial)')).toBeInTheDocument()
+    expect(screen.getByText(/456\.042 COP\/ha/)).toBeInTheDocument()
+    expect(screen.getByText(/Diferencia de la estimación frente a la referencia/)).toBeInTheDocument()
+    expect(screen.getByText(/pertenece al inventario con el que se ajustó el modelo/)).toBeInTheDocument()
+  })
+
+  it('muestra el motivo cuando el predio no cumple las condiciones', async () => {
+    mockFetch({
+      '/system/status': {
+        ...statusFixture,
+        valor_v1: { habilitado: true, disponible: true, model_id: 'atlas-vivo-rf-v1', model_version: '1.0.0' },
+      },
+      '/predictions/valor-terreno-v1': {
+        error: {
+          code: 'UNSUPPORTED_PARCEL',
+          message: 'El predio no tiene características compatibles',
+          details: { razon: 'el predio registra construcción; la demostración solo admite el escenario A (construcción = 0)' },
+        },
+      },
+      '/properties': parcelsFixture,
+    })
+    renderAt('/prediccion', <Prediction />)
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Consultar estimación/ })).toBeEnabled()
+    })
+    const input = screen.getByRole('combobox', { name: 'Identificador público del predio' })
+    await userEvent.type(input, 'p_ab')
+    const option = await screen.findByRole('option', { name: /p_abc123/ })
+    await userEvent.click(option)
+    await userEvent.click(screen.getByRole('button', { name: /Consultar estimación/ }))
+    await waitFor(() => {
+      expect(screen.getByText(/422 UNSUPPORTED_PARCEL/)).toBeInTheDocument()
+    })
+    expect(screen.getByText(/no cumple las condiciones de aplicación/)).toBeInTheDocument()
+    expect(screen.getByText(/el predio registra construcción/)).toBeInTheDocument()
   })
 })
 

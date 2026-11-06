@@ -75,17 +75,24 @@ function mockFetch(routes: Record<string, unknown>) {
   globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input)
     if (url.includes('/predictions/valor-terreno-v1')) {
-      return new Response(JSON.stringify(valorV1Fixture), {
-        status: 200,
+      const payload = routes['/predictions/valor-terreno-v1']
+      const esError = (payload as { error?: unknown })?.error != null
+      return new Response(JSON.stringify(payload), {
+        status: esError ? 503 : 200,
         headers: { 'Content-Type': 'application/json' },
       })
     }
-    const hit = routes[url]
-    if (!hit) return new Response('{}', { status: 404 })
-    return new Response(JSON.stringify(hit), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    for (const [needle, payload] of Object.entries(routes).sort(
+      (a, b) => b[0].length - a[0].length,
+    )) {
+      if (url.endsWith(needle)) {
+        return new Response(JSON.stringify(payload), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+    }
+    return new Response('{}', { status: 404 })
   }) as unknown as typeof fetch
 }
 
@@ -93,43 +100,80 @@ beforeEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('Estimación ML — demostración académica (valor v1)', () => {
-  it('muestra la sección desactivada cuando el flag está apagado', async () => {
+describe('Estimación catastral con inteligencia artificial (RF v1)', () => {
+  it('muestra indisponibilidad clara cuando el flag está apagado', async () => {
     mockFetch({
-      '/api/v1/system/status': { ...statusFixture, valor_v1: { habilitado: false, disponible: false } },
+      '/system/status': { ...statusFixture, valor_v1: { habilitado: false, disponible: false } },
     })
     renderPrediction()
     await waitFor(() => {
-      expect(
-        screen.getByText(/Estimación con Machine Learning — Demostración académica/),
-      ).toBeInTheDocument()
+      expect(screen.getByText('VALOR_V1_ENABLED=false')).toBeInTheDocument()
     })
-    expect(screen.getByText(/VALOR_V1_ENABLED=false/)).toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: /Estimar con Random Forest/ }),
-    ).not.toBeInTheDocument()
+    expect(screen.getByText(/no está habilitado en este entorno/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Consultar estimación/ })).toBeDisabled()
   })
 
   it('estima y muestra la referencia ZHG separada de la predicción', async () => {
-    mockFetch({ '/api/v1/system/status': statusFixture })
+    mockFetch({
+      '/system/status': statusFixture,
+      '/predictions/valor-terreno-v1': valorV1Fixture,
+    })
     const user = userEvent.setup()
     renderPrediction()
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Estimar con Random Forest/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Consultar estimación/ })).toBeEnabled()
     })
     const input = screen.getByLabelText(/Identificador público del predio/, {
       selector: '#valor-v1-id',
     })
     await user.type(input, 'p_abc123')
-    await user.click(screen.getByRole('button', { name: /Estimar con Random Forest/ }))
+    await user.click(screen.getByRole('button', { name: /Consultar estimación/ }))
     await waitFor(() => {
-      expect(screen.getByText(/A\. Referencia ZHG \(dato consultado\)/)).toBeInTheDocument()
+      expect(screen.getByText(/505\.000 COP\/ha/)).toBeInTheDocument()
     })
-    expect(screen.getByText(/B\. Estimación Random Forest/)).toBeInTheDocument()
-    expect(screen.getByText(/505\.000 COP\/ha/)).toBeInTheDocument()
-    expect(screen.getByText(/456\.042 COP\/ha/)).toBeInTheDocument()
     expect(screen.getByText(/atlas-vivo-rf-v1/)).toBeInTheDocument()
+    expect(screen.getByText('Referencia ZHG (dato territorial)')).toBeInTheDocument()
+    expect(screen.getByText(/456\.042 COP\/ha/)).toBeInTheDocument()
+    expect(screen.getByText(/pertenece al inventario con el que se ajustó el modelo/)).toBeInTheDocument()
     expect(screen.getByText(/ganó en MAE 0\/5/)).toBeInTheDocument()
     expect(screen.getByText(/No existe todavía un modelo definitivo aprobado/)).toBeInTheDocument()
+  })
+
+  it('muestra el error 503 de indisponibilidad del servicio', async () => {
+    mockFetch({
+      '/system/status': statusFixture,
+      '/predictions/valor-terreno-v1': {
+        error: {
+          code: 'VALOR_V1_UNAVAILABLE',
+          message: 'El artefacto del modelo RF v1 no está disponible o no superó la verificación de integridad',
+        },
+      },
+    })
+    const user = userEvent.setup()
+    renderPrediction()
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Consultar estimación/ })).toBeEnabled()
+    })
+    const input = screen.getByLabelText(/Identificador público del predio/, {
+      selector: '#valor-v1-id',
+    })
+    await user.type(input, 'p_abc123')
+    await user.click(screen.getByRole('button', { name: /Consultar estimación/ }))
+    await waitFor(() => {
+      expect(screen.getByText(/503 VALOR_V1_UNAVAILABLE/)).toBeInTheDocument()
+    })
+    expect(screen.getByText(/no está disponible en este entorno en este momento/)).toBeInTheDocument()
+  })
+
+  it('no renderiza los apartados antiguos', async () => {
+    mockFetch({ '/system/status': statusFixture })
+    renderPrediction()
+    await waitFor(() => {
+      expect(screen.getByText('Estimación catastral con inteligencia artificial')).toBeInTheDocument()
+    })
+    expect(screen.queryByText(/503 MODEL_NOT_READY/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Consulta de referencia de valor/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Demostración experimental \(zonas conocidas\)/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Simulador/)).not.toBeInTheDocument()
   })
 })

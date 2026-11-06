@@ -1,4 +1,4 @@
-# Guía de funcionamiento — Estimación con Machine Learning (demostración académica)
+# Guía de funcionamiento — Estimación catastral con inteligencia artificial
 
 ## Qué hace la funcionalidad
 
@@ -13,13 +13,14 @@ predio por su identificador público y obtener **dos valores separados**:
 ## Flujo de uso
 
 1. Abrir `https://atlasvivo.xyz/prediccion` (o el entorno local).
-2. Buscar la sección **"Estimación con Machine Learning — Demostración
-   académica"**.
+2. La página **"Estimación catastral con inteligencia artificial"** muestra
+   el modelo Atlas Vivo · Random Forest v1 como único flujo de estimación.
 3. Escribir el identificador público de un predio (ejemplo verificado:
    `p_6049c425ce3cf79d`).
-4. Pulsar **"Estimar con Random Forest"**.
-5. Leer el resultado: estimación en COP/ha, referencia ZHG, diferencia,
-   condiciones de aplicación, métricas de validación reales y limitaciones.
+4. Pulsar **"Consultar estimación"**.
+5. Leer el resultado: estimación en COP/ha, referencia ZHG (dato
+   territorial, en bloque separado), diferencia, condiciones de aplicación,
+   métricas de validación reales y limitaciones.
 
 ## Qué muestra el resultado
 

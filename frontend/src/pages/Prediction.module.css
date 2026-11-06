@@ -340,3 +340,59 @@
     grid-template-columns: 1fr;
   }
 }
+
+.unavailableCard {
+  margin-top: var(--s3);
+  padding: var(--s3);
+  border: 1px solid var(--copper);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--copper) 8%, transparent);
+}
+
+.unavailableCode {
+  color: var(--copper);
+  font-size: 0.85rem;
+}
+
+.errorTitle {
+  font-weight: 600;
+  color: var(--chalk);
+}
+
+.errorDetails {
+  margin: var(--s2) 0 0;
+  padding-left: 1.2rem;
+  color: var(--stone);
+  font-size: 0.95rem;
+}
+
+.resultTarget {
+  color: var(--stone);
+  font-size: 0.95rem;
+  margin-top: var(--s1);
+}
+
+.refBlock {
+  padding: var(--s2);
+  border: 1px solid var(--line, #333);
+  border-radius: var(--r-sm);
+}
+
+.refNote {
+  color: var(--stone);
+  font-size: 0.85rem;
+  margin-top: var(--s1);
+}
+
+.fitNote {
+  margin-top: var(--s3);
+  padding: var(--s2);
+  border-left: 3px solid var(--copper);
+  color: var(--stone);
+  font-size: 0.9rem;
+}
+
+.methodLink {
+  color: var(--copper);
+  text-decoration: underline;
+}
