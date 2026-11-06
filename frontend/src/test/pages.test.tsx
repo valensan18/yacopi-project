@@ -282,7 +282,8 @@ describe('Pantalla Predicción', () => {
     await waitFor(() => {
       expect(screen.getByText(/Demostración experimental \(zonas conocidas\)/)).toBeInTheDocument()
     })
-    expect(screen.getByText(/desactivada en este entorno/)).toBeInTheDocument()
+    expect(screen.getAllByText(/desactivada en este entorno/).length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText(/Estimación con Machine Learning — Demostración académica/)).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: /Ejecutar demostración experimental/ }),
     ).not.toBeInTheDocument()

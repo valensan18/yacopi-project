@@ -26,6 +26,7 @@ ENV APP_ENV=production \
     MODEL_DIR=/app/model \
     EXPERIMENTAL_INFERENCE_ENABLED=false \
     EXPERIMENTAL_ZHG_ENABLED=false \
+    VALOR_V1_ENABLED=false \
     CORS_ORIGINS=http://localhost
 
 EXPOSE 8000

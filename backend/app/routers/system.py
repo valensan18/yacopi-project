@@ -37,6 +37,9 @@ def system_status(request: Request) -> SystemStatus:
     experimental_zhg = request.app.state.experimental_zhg.info()
     experimental_zhg["habilitado"] = settings.experimental_zhg_enabled
 
+    valor_v1 = request.app.state.valor_v1.info()
+    valor_v1["habilitado"] = settings.valor_v1_enabled
+
     return SystemStatus(
         data_status="audited_and_curated" if dataset_version else "unavailable",
         dataset_version=dataset_version,
@@ -45,6 +48,7 @@ def system_status(request: Request) -> SystemStatus:
         target_unit="COP/ha",
         experimental_model=experimental,
         experimental_zhg=experimental_zhg,
+        valor_v1=valor_v1,
         reason=(
             "Valor exclusivo de terreno por predio no validado; el endpoint "
             "oficial de predicción permanece bloqueado"

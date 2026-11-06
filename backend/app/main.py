@@ -33,6 +33,7 @@ from .services.prediction import (
     ExperimentalPredictionService,
     OfficialPredictionService,
 )
+from .services.valor_v1 import ValorV1Service
 
 logger = logging.getLogger("yacopi.api")
 
@@ -59,6 +60,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     experimental_predictor = ExperimentalPredictionService(settings.model_dir)
     experimental_zhg = ExperimentalZhgService(settings.model_dir)
+    valor_v1 = ValorV1Service(settings.model_dir)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -67,6 +69,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.official_predictor = OfficialPredictionService()
         app.state.experimental_predictor = experimental_predictor
         app.state.experimental_zhg = experimental_zhg
+        app.state.valor_v1 = valor_v1
 
         if settings.experimental_inference_enabled:
             try:
@@ -87,6 +90,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 logger.warning("Demostración ZHG NO cargada: %s", exc)
         else:
             logger.info("Demostración ZHG desactivada por configuración")
+
+        if settings.valor_v1_enabled:
+            try:
+                valor_v1.load()
+                logger.info("Modelo RF v1 cargado: %s", valor_v1.artifact_dir)
+            except Exception as exc:  # noqa: BLE001 — se registra y sigue sin v1
+                logger.warning("Modelo RF v1 NO cargado: %s", exc)
+        else:
+            logger.info("Modelo RF v1 desactivado por configuración")
 
         app.state.dataset_version = resolve_dataset_version(settings)
         yield

@@ -90,6 +90,24 @@ class OutOfDomainError(ApiError):
     message = "El predio queda fuera del dominio observado en el entrenamiento"
 
 
+class ValorV1DisabledError(ApiError):
+    code = "VALOR_V1_DISABLED"
+    status = 503
+    message = (
+        "La demostración académica del modelo RF v1 está desactivada en este "
+        "entorno"
+    )
+
+
+class ValorV1UnavailableError(ApiError):
+    code = "VALOR_V1_UNAVAILABLE"
+    status = 503
+    message = (
+        "El artefacto del modelo RF v1 no está disponible o no superó la "
+        "verificación de integridad"
+    )
+
+
 class InvalidQueryError(ApiError):
     code = "INVALID_INPUT"
     status = 422

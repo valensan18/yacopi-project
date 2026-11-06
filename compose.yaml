@@ -16,6 +16,7 @@ services:
       APP_ENV: production
       DATABASE_PATH: /app/data/parcels.db
       MODEL_DIR: /app/model
+      VALOR_V1_ENABLED: "false"
     volumes:
       - ./deploy-data/parcels.db:/app/data/parcels.db:ro
       - ./deploy-model:/app/model:ro

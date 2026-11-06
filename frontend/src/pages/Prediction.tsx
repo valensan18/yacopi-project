@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { apiGet, apiPost, ApiError } from '../api/client'
-import type { SystemStatus, ZhgDemoResponse } from '../api/types'
+import type { SystemStatus, ZhgDemoResponse, ValorV1Response } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import Disclaimer from '../components/Disclaimer'
 import ZhgReferenceCard from '../components/ZhgReferenceCard'
@@ -278,6 +278,165 @@ function ZhgDemoSection() {
   )
 }
 
+function ValorV1Section() {
+  const [input, setInput] = useState('')
+
+  const status = useQuery<SystemStatus>({
+    queryKey: ['system-status'],
+    queryFn: () => apiGet<SystemStatus>('/system/status'),
+    staleTime: 60_000,
+  })
+
+  const estimacion = useMutation({
+    mutationFn: (publicId: string) =>
+      apiPost<ValorV1Response>('/predictions/valor-terreno-v1', { public_id: publicId }),
+  })
+
+  const enabled = status.data?.valor_v1?.habilitado === true
+  const ready = status.data?.valor_v1?.disponible === true
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault()
+    const id = input.trim()
+    if (!id) return
+    estimacion.reset()
+    estimacion.mutate(id)
+  }
+
+  const evaluation = (estimacion.data?.evaluation_context ?? {}) as Record<string, unknown>
+  const estabilidad = (evaluation.estabilidad_5_pliegues_espaciales ?? {}) as Record<string, number>
+
+  return (
+    <section className={styles.expSection} aria-label="Estimación con Machine Learning">
+      <p className={`mono ${styles.demoKicker}`}>
+        Predicción ML · demostración académica (Random Forest, escenario A)
+      </p>
+      <h2 className={styles.sectionTitle}>Estimación con Machine Learning — Demostración académica</h2>
+
+      {!enabled ? (
+        <>
+          <p>
+            La demostración académica del modelo Random Forest está{' '}
+            <strong>desactivada en este entorno</strong>{' '}
+            (<span className="mono">VALOR_V1_ENABLED=false</span>). Se habilita
+            únicamente en el servidor con el artefacto{' '}
+            <span className="mono">exp-valor-v1</span> presente y verificado.
+          </p>
+          <p className={styles.expNote}>
+            La funcionalidad está implementada y es operativa cuando el backend
+            dispone del artefacto; su resultado es una estimación orientativa de
+            valor catastral unitario, no un avalúo.
+          </p>
+        </>
+      ) : !ready ? (
+        <p className={styles.expNote}>
+          El artefacto del modelo RF v1 no está disponible en este servidor.
+        </p>
+      ) : (
+        <>
+          <p>
+            Demostración con el modelo <strong>Atlas Vivo RF v1</strong> para predios{' '}
+            <strong>sin construcción registrada</strong> (escenario A). Se muestran
+            siempre dos valores separados: la referencia territorial ZHG (dato) y la
+            estimación calculada por el modelo (predicción).
+          </p>
+          <form className={styles.searchForm} onSubmit={submit}>
+            <label className={styles.searchLabel} htmlFor="valor-v1-id">
+              Identificador público del predio
+            </label>
+            <div className={styles.searchRow}>
+              <ParcelSelector
+                id="valor-v1-id"
+                value={input}
+                onChange={setInput}
+              />
+              <button type="submit" className={styles.searchButton} disabled={estimacion.isPending}>
+                {estimacion.isPending ? 'Calculando…' : 'Estimar con Random Forest'}
+              </button>
+            </div>
+          </form>
+
+          {estimacion.isError && (
+            <div className={styles.resultError} role="alert">
+              {estimacion.error instanceof ApiError
+                ? `${estimacion.error.status} ${estimacion.error.code}: ${estimacion.error.message}`
+                : 'No se pudo ejecutar la estimación.'}
+            </div>
+          )}
+
+          {estimacion.isSuccess && estimacion.data && (
+            <div className={styles.demoResult} role="status">
+              <p className={`mono ${styles.resultCode}`}>
+                {estimacion.data.model_id} · v{estimacion.data.model_version} ·{' '}
+                {estimacion.data.model_role}
+              </p>
+              <div className={styles.demoGrid}>
+                <div>
+                  <p className={styles.demoLabel}>A. Referencia ZHG (dato consultado)</p>
+                  <p className={styles.demoValue}>
+                    {estimacion.data.reference_zhg_cop_ha != null
+                      ? formatCopPerHa(estimacion.data.reference_zhg_cop_ha)
+                      : 'Sin referencia en los datos'}
+                  </p>
+                </div>
+                <div>
+                  <p className={styles.demoLabel}>B. Estimación Random Forest</p>
+                  <p className={`${styles.demoValue} ${styles.demoEstimate}`}>
+                    {formatCopPerHa(estimacion.data.predicted_cop_ha)}
+                  </p>
+                </div>
+                {estimacion.data.absolute_difference_vs_zhg_cop_ha != null && (
+                  <div>
+                    <p className={styles.demoLabel}>Diferencia (B − A)</p>
+                    <p className={`${styles.demoValue} mono`}>
+                      {formatCopPerHa(estimacion.data.absolute_difference_vs_zhg_cop_ha)}
+                      {estimacion.data.relative_difference_vs_zhg_pct != null &&
+                        ` (${estimacion.data.relative_difference_vs_zhg_pct} %)`}
+                    </p>
+                  </div>
+                )}
+              </div>
+              <p className={styles.demoMeta}>
+                Predio {estimacion.data.public_id}
+                {estimacion.data.zone_code && ` · zona ${estimacion.data.zone_code}`} ·
+                variable: {estimacion.data.target} ({estimacion.data.unit})
+              </p>
+
+              <details className={styles.demoDetails}>
+                <summary>Condiciones de aplicación y métricas de validación reales</summary>
+                <ul className={styles.warnings}>
+                  {estimacion.data.applicability_conditions.map((c) => (
+                    <li key={c}>{c}</li>
+                  ))}
+                </ul>
+                <p className={styles.expNote}>
+                  Validación independiente (espacial): MAE del modelo ≈ 767.064 COP/ha
+                  (MdAPE ≈ 11,7 %) frente a la referencia ZHG ≈ 817.030 COP/ha
+                  (MdAPE ≈ 5,7 %). Estabilidad en 5 particiones espaciales: el modelo
+                  ganó en MAE {estabilidad.rf_gana_mae_en ?? 0}/5 y en MdAPE{' '}
+                  {estabilidad.rf_gana_mdape_en ?? 0}/5 — <strong>el desempeño es
+                  limitado y depende del territorio</strong>.
+                </p>
+              </details>
+
+              <details className={styles.demoDetails}>
+                <summary>Ver limitaciones</summary>
+                <ul className={styles.warnings}>
+                  {estimacion.data.limitations.map((limitation) => (
+                    <li key={limitation}>{limitation}</li>
+                  ))}
+                </ul>
+              </details>
+
+              <p className={styles.demoDisclaimer}>{estimacion.data.disclaimer}</p>
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  )
+}
+
 export default function Prediction() {
   const [officialResult, setOfficialResult] = useState<string | null>(null)
   const [form, setForm] = useState<Record<string, string>>({
@@ -376,6 +535,8 @@ export default function Prediction() {
       )}
 
       <ZhgDemoSection />
+
+      <ValorV1Section />
 
       {/* Experimento proxy histórico (avalúo total/ha): se muestra SOLO si su
           flag local está activo. Desactivado por defecto, no se presenta al

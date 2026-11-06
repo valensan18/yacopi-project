@@ -8,6 +8,8 @@ from ..core.errors import (
     ExperimentalZhgDisabledError,
     ExperimentalZhgUnavailableError,
     PropertyNotFoundError,
+    ValorV1DisabledError,
+    ValorV1UnavailableError,
 )
 from ..schemas.demo import ZhgDemoRequest, ZhgDemoResponse
 from ..schemas.prediction import (
@@ -16,6 +18,7 @@ from ..schemas.prediction import (
     PredictionRequest,
     PredictionResponse,
 )
+from ..schemas.valor_v1 import ValorV1Request, ValorV1Response
 
 router = APIRouter(tags=["predictions"])
 
@@ -80,3 +83,38 @@ def experimental_zhg(request: Request, payload: ZhgDemoRequest):
             raise PropertyNotFoundError(details={"public_id": payload.public_id})
 
     return ZhgDemoResponse(**service.predict(payload.public_id))
+
+
+@router.post("/predictions/valor-terreno-v1", response_model=ValorV1Response)
+def valor_v1_prediction(request: Request, payload: ValorV1Request):
+    """Demostración académica del modelo RF v1 (VALOR_TERRENO_Ha, escenario
+    A): inferencia REAL con Random Forest, desactivada por defecto. Devuelve
+    la referencia ZHG como dato contextual diferenciado de la predicción."""
+    settings = request.app.state.settings
+    if not settings.valor_v1_enabled:
+        raise ValorV1DisabledError(details={
+            "config": "VALOR_V1_ENABLED=false",
+        })
+
+    service = request.app.state.valor_v1
+    if not service.available():
+        raise ValorV1UnavailableError(details={
+            "razon": "artefacto exp-valor-v1 no cargado",
+        })
+
+    from ..db import repository
+    from ..db.connection import get_connection
+
+    try:
+        conn = get_connection(settings.database_path)
+    except FileNotFoundError:
+        conn = None
+    if conn is not None:
+        try:
+            exists = repository.parcel_exists(conn, payload.public_id)
+        finally:
+            conn.close()
+        if not exists:
+            raise PropertyNotFoundError(details={"public_id": payload.public_id})
+
+    return ValorV1Response(**service.predict(payload.public_id))

@@ -11,6 +11,7 @@ class SystemStatus(BaseModel):
     target_unit: str
     experimental_model: dict
     experimental_zhg: dict = {}
+    valor_v1: dict = {}
     reason: str
     public_notice: str
 

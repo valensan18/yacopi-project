@@ -15,6 +15,13 @@ export interface ExperimentalZhgInfo {
   model_id?: string
 }
 
+export interface ValorV1Info {
+  habilitado: boolean
+  disponible: boolean
+  model_id?: string | null
+  model_version?: string | null
+}
+
 export interface SystemStatus {
   data_status: string
   dataset_version: string | null
@@ -23,6 +30,7 @@ export interface SystemStatus {
   target_unit: string
   experimental_model: ExperimentalModelInfo
   experimental_zhg?: ExperimentalZhgInfo
+  valor_v1?: ValorV1Info
   reason: string
   public_notice: string
 }
@@ -172,5 +180,27 @@ export interface ZhgDemoResponse {
   reference_date: null
   limitations: string[]
   evaluation_context: Record<string, unknown>
+  disclaimer: string
+}
+
+export interface ValorV1Response {
+  public_id: string
+  model_id: string
+  model_version: string
+  model_role: string
+  target: string
+  target_description: string
+  unit: string
+  predicted_cop_ha: number
+  reference_zhg_cop_ha: number | null
+  reference_zhg_note: string | null
+  absolute_difference_vs_zhg_cop_ha: number | null
+  relative_difference_vs_zhg_pct: number | null
+  zone_code: string | null
+  applicability_status: string
+  applicability_conditions: string[]
+  evaluation_context: Record<string, unknown>
+  reference_date: null
+  limitations: string[]
   disclaimer: string
 }
