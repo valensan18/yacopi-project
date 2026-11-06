@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { apiGet, apiPost, ApiError, isTimeoutError } from '../api/client'
 import type { SystemStatus, ValorV1Response } from '../api/types'
 import PageHeader from '../components/PageHeader'
@@ -48,6 +48,8 @@ function mensajeDeError(error: unknown): { titulo: string; detalles: string[] } 
 
 export default function Prediction() {
   const [input, setInput] = useState('')
+  const [searchParams] = useSearchParams()
+  const publicIdParam = searchParams.get('public_id')?.trim() ?? ''
 
   const status = useQuery<SystemStatus>({
     queryKey: ['system-status'],
@@ -62,6 +64,18 @@ export default function Prediction() {
 
   const habilitado = status.data?.valor_v1?.habilitado === true
   const disponible = status.data?.valor_v1?.disponible === true
+  const autoDisparado = useRef(false)
+
+  useEffect(() => {
+    if (!publicIdParam) return
+    setInput(publicIdParam)
+    if (habilitado && disponible && !autoDisparado.current) {
+      autoDisparado.current = true
+      estimacion.reset()
+      estimacion.mutate(publicIdParam)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicIdParam, habilitado, disponible])
 
   function submit(event: React.FormEvent) {
     event.preventDefault()

@@ -50,6 +50,7 @@ class ValorV1Service:
         self.manifest: dict = {}
         self.schema: dict = {}
         self.evaluacion: dict = {}
+        self.predios_admitidos: set[str] = set()
 
     def available(self) -> bool:
         return self.model is not None
@@ -100,6 +101,45 @@ class ValorV1Service:
         self.evaluacion = json.loads(
             (self.artifact_dir / "metrics_evaluacion.json").read_text(encoding="utf-8")
         )
+        self.predios_admitidos = self._calcular_admitidos()
+
+    def _calcular_admitidos(self) -> set[str]:
+        """Predios del inventario que superan TODAS las validaciones de
+        dominio (construcción = 0, área positiva, rangos y categorías del
+        entrenamiento). El conteo refleja los realmente elegibles."""
+        numericas = set(self.schema["numericas"])
+        categoricas = set(self.schema["categoricas"])
+        admitidos: set[str] = set()
+        for public_id, entry in self.features.items():
+            row = entry.get("features", {})
+            if float(row.get("area_terreno_m2") or 0) <= 0:
+                continue
+            if float(row.get("area_construida_m2") or 0) != 0:
+                continue
+            fuera = False
+            for col in numericas:
+                value = row.get(col)
+                if value is None or not np.isfinite(float(value)):
+                    fuera = True
+                    break
+                stats_col = self.stats["numeric"].get(col)
+                if stats_col and not (
+                    stats_col["min"] <= float(value) <= stats_col["max"]
+                ):
+                    fuera = True
+                    break
+            if fuera:
+                continue
+            for col in categoricas:
+                if str(row.get(col)) not in self.stats["categorical"].get(col, []):
+                    fuera = True
+                    break
+            if not fuera:
+                admitidos.add(public_id)
+        return admitidos
+
+    def admitidos(self) -> set[str]:
+        return self.predios_admitidos if self.available() else set()
 
     def info(self) -> dict:
         return {
@@ -108,6 +148,9 @@ class ValorV1Service:
             "model_id": self.manifest.get("model_id") if self.available() else None,
             "model_version": (
                 self.manifest.get("model_version") if self.available() else None
+            ),
+            "predios_admitidos": (
+                len(self.predios_admitidos) if self.available() else None
             ),
         }
 

@@ -103,8 +103,8 @@ def build_mini_valor_v1(model_dir) -> None:
     joblib.dump(model, art / "model.joblib")
 
     features = {}
-    for _, fila in rng.iterrows():
-        pid = f"p_fixture_{int(fila['area_terreno_m2'])}"
+    for i, (_, fila) in enumerate(rng.iterrows()):
+        pid = f"p_fixture_{i}"
         features[pid] = {
             "features": {
                 "area_terreno_m2": float(fila["area_terreno_m2"]),

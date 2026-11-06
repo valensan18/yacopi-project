@@ -36,6 +36,7 @@ def list_parcels(
     max_lat: float | None = None,
     max_lon: float | None = None,
     public_id_prefix: str | None = None,
+    only_ids: set[str] | None = None,
     sort: str = "public_id",
     sort_desc: bool = False,
     limit: int = 20,
@@ -52,6 +53,19 @@ def list_parcels(
     if public_id_prefix:
         where.append("public_id LIKE ? || '%'")
         params.append(public_id_prefix)
+    if only_ids is not None:
+        # Tabla temporal en la conexion (permitida en modo lectura) para
+        # filtrar por el inventario elegible ANTES de paginar y contar.
+        conn.execute(
+            "CREATE TEMP TABLE IF NOT EXISTS tmp_eligibles "
+            "(public_id TEXT PRIMARY KEY)"
+        )
+        conn.execute("DELETE FROM tmp_eligibles")
+        conn.executemany(
+            "INSERT OR IGNORE INTO tmp_eligibles (public_id) VALUES (?)",
+            [(pid,) for pid in only_ids],
+        )
+        where.append("public_id IN (SELECT public_id FROM tmp_eligibles)")
     if min_area is not None:
         where.append("area_terreno_catastral_m2 >= ?")
         params.append(min_area)

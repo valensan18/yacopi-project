@@ -58,13 +58,13 @@ const valorV1Fixture = {
   disclaimer: 'Estimación orientativa de valor catastral unitario. No constituye un avalúo.',
 }
 
-function renderPrediction() {
+function renderPrediction(entry?: string) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[entry ?? '/prediccion']}>
         <Prediction />
       </MemoryRouter>
     </QueryClientProvider>,
@@ -163,6 +163,19 @@ describe('Estimación catastral con inteligencia artificial (RF v1)', () => {
       expect(screen.getByText(/503 VALOR_V1_UNAVAILABLE/)).toBeInTheDocument()
     })
     expect(screen.getByText(/no está disponible en este entorno en este momento/)).toBeInTheDocument()
+  })
+
+  it('consulta automáticamente al llegar con ?public_id=', async () => {
+    mockFetch({
+      '/system/status': statusFixture,
+      '/predictions/valor-terreno-v1': valorV1Fixture,
+    })
+    renderPrediction('/prediccion?public_id=p_abc123')
+    await waitFor(() => {
+      expect(screen.getByText(/505\.000 COP\/ha/)).toBeInTheDocument()
+    })
+    expect(screen.getByText(/atlas-vivo-rf-v1/)).toBeInTheDocument()
+    expect(screen.getByText(/pertenece al inventario con el que se ajustó el modelo/)).toBeInTheDocument()
   })
 
   it('no renderiza los apartados antiguos', async () => {

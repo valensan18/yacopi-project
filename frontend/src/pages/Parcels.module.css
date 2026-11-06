@@ -212,3 +212,22 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+.disclaimer {
+  color: var(--stone);
+  font-size: 0.95rem;
+  margin-top: var(--s1);
+}
+
+.unavailableCard {
+  margin-top: var(--s3);
+  padding: var(--s3);
+  border: 1px solid var(--copper);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--copper) 8%, transparent);
+}
+
+.unavailableCode {
+  color: var(--copper);
+  font-size: 0.85rem;
+}

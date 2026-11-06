@@ -4,7 +4,12 @@ import sqlite3
 
 from fastapi import APIRouter, Query, Request
 
-from ..core.errors import InvalidQueryError, PropertyNotFoundError
+from ..core.errors import (
+    InvalidQueryError,
+    PropertyNotFoundError,
+    ValorV1DisabledError,
+    ValorV1UnavailableError,
+)
 from ..db import repository
 from ..db.connection import get_connection
 from ..schemas.properties import (
@@ -54,10 +59,30 @@ def list_properties(
         pattern="^p_[0-9a-f]{0,16}$",
         description="Prefijo de identificador público (búsqueda para el selector)",
     ),
+    solo_estimables: bool = Query(
+        default=False,
+        description=(
+            "Mostrar únicamente predios elegibles para la estimación del "
+            "modelo académico RF v1 (escenario A, validaciones de dominio)"
+        ),
+    ),
 ) -> ParcelPage:
     settings = request.app.state.settings
     if limit > settings.max_page_limit:
         limit = settings.max_page_limit
+
+    only_ids: set[str] | None = None
+    if solo_estimables:
+        if not settings.valor_v1_enabled:
+            raise ValorV1DisabledError(details={
+                "config": "VALOR_V1_ENABLED=false",
+            })
+        service = request.app.state.valor_v1
+        if not service.available():
+            raise ValorV1UnavailableError(details={
+                "razon": "artefacto exp-valor-v1 no cargado",
+            })
+        only_ids = service.admitidos()
 
     conn = _connect(request)
     try:
@@ -68,6 +93,7 @@ def list_properties(
             min_lat=min_lat, min_lon=min_lon,
             max_lat=max_lat, max_lon=max_lon,
             public_id_prefix=public_id_prefix,
+            only_ids=only_ids,
             sort=sort, sort_desc=sort_desc,
             limit=limit, offset=offset,
         )

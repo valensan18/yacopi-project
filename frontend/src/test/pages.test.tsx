@@ -208,16 +208,38 @@ beforeEach(() => {
 })
 
 describe('Pantalla Predios', () => {
-  it('muestra el total real y filas de la API', async () => {
+  it('muestra el listado filtrado con enlace directo a la estimación', async () => {
     mockFetch({ '/statistics/overview': overviewFixture, '/properties': parcelsFixture })
     renderAt('/predios', <Parcels />)
     await waitFor(() => {
-      expect(screen.getByText(/7.709 predios/)).toBeInTheDocument()
-    })
-    await waitFor(() => {
       expect(screen.getByText('p_abc123')).toBeInTheDocument()
-      expect(screen.getByText(/de 7.709 predios/)).toBeInTheDocument()
     })
+    expect(screen.getByText(/7.709 predios permanece intacta/)).toBeInTheDocument()
+    const estimar = screen.getByRole('link', {
+      name: /Consultar estimación del predio p_abc123/,
+    })
+    expect(estimar).toHaveAttribute('href', '/prediccion?public_id=p_abc123')
+    expect(screen.getByRole('link', { name: /Ver ficha del predio p_abc123/ })).toBeInTheDocument()
+    expect(screen.getAllByText(/de 7.709 predios/).length).toBeGreaterThan(0)
+  })
+
+  it('muestra indisponibilidad cuando la estimación está desactivada', async () => {
+    mockFetch({
+      '/statistics/overview': overviewFixture,
+      '/properties': {
+        error: {
+          code: 'VALOR_V1_DISABLED',
+          message: 'La demostración académica del modelo RF v1 está desactivada en este entorno',
+        },
+      },
+    })
+    renderAt('/predios', <Parcels />)
+    await waitFor(() => {
+      expect(screen.getByText(/VALOR_V1_DISABLED/)).toBeInTheDocument()
+    })
+    expect(
+      screen.getByText(/no está habilitada o su artefacto no está disponible/),
+    ).toBeInTheDocument()
   })
 })
 

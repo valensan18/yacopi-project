@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { apiGet } from '../api/client'
+import { apiGet, ApiError } from '../api/client'
 import type { OverviewStats, ParcelPage } from '../api/types'
 import PageHeader from '../components/PageHeader'
 import { DataQualityBadge } from '../components/DataQualityBadge'
@@ -42,13 +42,14 @@ export default function Parcels() {
   })
 
   const query = useQuery<ParcelPage>({
-    queryKey: ['parcels', destino, subzona, minArea, maxArea, sort, sortDesc, limit, offset],
+    queryKey: ['parcels-estimables', destino, subzona, minArea, maxArea, sort, sortDesc, limit, offset],
     queryFn: () =>
       apiGet<ParcelPage>('/properties', {
         destino, subzona,
         min_area_m2: minArea, max_area_m2: maxArea,
         sort, sort_desc: sortDesc ? '1' : '0',
         limit, offset,
+        solo_estimables: '1',
       }),
   })
 
@@ -79,13 +80,23 @@ export default function Parcels() {
   const pages = total && limit ? Math.max(1, Math.ceil(total / limit)) : null
   const currentPage = limit ? Math.floor(offset / limit) + 1 : 1
 
+  const esIndisponibilidad =
+    query.isError &&
+    query.error instanceof ApiError &&
+    (query.error.code === 'VALOR_V1_DISABLED' || query.error.code === 'VALOR_V1_UNAVAILABLE')
+
   return (
     <div className="container">
       <PageHeader
-        kicker="Catálogo · GEO LAB"
-        title="Predios"
-        lede="Consulta los 7.709 predios consolidados del municipio con atributos reales, filtros servidos por la API y paginación auténtica. Los identificadores son opacos: nunca se exponen matrículas ni datos personales."
+        kicker="Catálogo · Estimación RF v1"
+        title="Predios con estimación disponible"
+        lede="Este listado muestra únicamente los predios compatibles con el modelo académico Random Forest v1 (sin construcción registrada y dentro del dominio observado). La base consolidada de 7.709 predios permanece intacta: este catálogo no borra ni modifica registros."
       />
+
+      <p className={styles.disclaimer}>
+        Las estimaciones son académicas y orientativas; no constituyen avalúos
+        oficiales ni comerciales.
+      </p>
 
       <form className={styles.searchForm} onSubmit={submitSearch} role="search">
         <label className={styles.searchLabel} htmlFor="buscar-predio">
@@ -191,7 +202,20 @@ export default function Parcels() {
 
       {query.isLoading && <LoadingSkeleton label="Consultando predios…" />}
 
-      {query.isError && (
+      {esIndisponibilidad && (
+        <div className={styles.unavailableCard} role="status">
+          <p className={`mono ${styles.unavailableCode}`}>
+            {query.error instanceof ApiError ? query.error.code : 'NO DISPONIBLE'}
+          </p>
+          <p>
+            La estimación RF v1 no está habilitada o su artefacto no está
+            disponible en este entorno: no se puede mostrar el listado de
+            predios compatibles en este momento.
+          </p>
+        </div>
+      )}
+
+      {query.isError && !esIndisponibilidad && (
         <ErrorState
           message="Verifica que el backend esté activo en el puerto 8000 e inténtalo de nuevo."
           onRetry={() => query.refetch()}
@@ -215,7 +239,8 @@ export default function Parcels() {
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <caption className={styles.caption}>
-                Predios de Yacopí — resultados reales paginados de la API
+                Predios compatibles con la estimación RF v1 — resultados reales
+                paginados de la API
               </caption>
               <thead>
                 <tr>
@@ -260,6 +285,13 @@ export default function Parcels() {
                       <DataQualityBadge count={parcel.n_alertas_calidad} />
                     </td>
                     <td>
+                      <Link
+                        className={styles.rowLink}
+                        to={`/prediccion?public_id=${parcel.public_id}`}
+                        aria-label={`Consultar estimación del predio ${parcel.public_id}`}
+                      >
+                        Estimar →
+                      </Link>{' '}
                       <Link
                         className={styles.rowLink}
                         to={`/predios/${parcel.public_id}`}
